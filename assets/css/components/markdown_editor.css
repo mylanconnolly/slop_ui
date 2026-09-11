@@ -1,0 +1,129 @@
+/*
+ * Markdown editor: toolbar + textarea, with a Write/Preview switch, image
+ * drop/paste, and a fullscreen mode.
+ */
+@layer sl.components {
+  .sl-md-editor {
+    --_border: var(--sl-color-border-strong);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--_border);
+    border-radius: var(--sl-input-radius, var(--sl-radius-md));
+    background-color: var(--sl-color-surface);
+    box-shadow: var(--sl-shadow-sm);
+    transition: border-color var(--sl-duration-fast) var(--sl-ease);
+
+    &:has(.sl-md-textarea:focus-visible) { --_border: var(--sl-color-focus); outline: var(--sl-focus-ring); outline-offset: 0; }
+    &[aria-invalid="true"] { --_border: var(--sl-color-danger); }
+    &[data-dragging] { --_border: var(--sl-color-accent); background-color: var(--sl-color-accent-soft); }
+
+    &[data-fullscreen] {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      border-radius: 0;
+      .sl-md-textarea, .sl-md-preview { flex: 1; min-block-size: 0; max-block-size: none; }
+    }
+  }
+
+  .sl-md-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sl-space-2);
+    padding: var(--sl-space-2);
+    border-block-end: 1px solid var(--sl-color-border);
+    background-color: var(--sl-color-surface-sunken);
+    border-start-start-radius: inherit;
+    border-start-end-radius: inherit;
+  }
+
+  .sl-md-modes {
+    display: inline-flex;
+    gap: 0.125rem;
+    padding: 0.125rem;
+    border-radius: var(--sl-radius-md);
+    background-color: var(--sl-color-neutral-soft);
+    > button {
+      min-block-size: calc(var(--sl-control-height-sm) - 0.25rem);
+      padding-inline: var(--sl-space-3);
+      border-radius: calc(var(--sl-radius-md) - 0.125rem);
+      color: var(--sl-color-fg-muted);
+      font-size: var(--sl-text-sm);
+      font-weight: var(--sl-weight-medium);
+      cursor: pointer;
+      &[aria-selected="true"] { background-color: var(--sl-color-surface-raised); color: var(--sl-color-fg); box-shadow: var(--sl-shadow-sm); }
+      &:focus-visible { outline-offset: -2px; }
+    }
+  }
+
+  .sl-md-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.125rem;
+    margin-inline-start: auto;
+    > .sl-button[aria-pressed="true"] { --_bg: var(--sl-color-neutral-soft); }
+    > .sl-md-sep { inline-size: 1px; block-size: 1.25rem; margin-inline: var(--sl-space-1); background-color: var(--sl-color-border-strong); }
+  }
+  .sl-md-editor[data-preview] .sl-md-toolbar > :not(.sl-md-fullscreen) { visibility: hidden; }
+
+  .sl-md-write { position: relative; display: flex; flex-direction: column; }
+
+  .sl-md-textarea {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    min-block-size: calc(var(--sl-md-rows, 8) * 1.5em + var(--sl-space-6));
+    max-block-size: 70vh;
+    padding: var(--sl-space-4);
+    font-family: var(--sl-font-mono);
+    font-size: var(--sl-text-sm);
+    line-height: 1.5;
+    resize: vertical;
+    field-sizing: content;
+    tab-size: 2;
+    &:focus-visible { outline: none; }
+  }
+  .sl-md-editor[data-preview] .sl-md-write { display: none; }
+
+  .sl-md-drop-hint {
+    position: absolute;
+    inset: var(--sl-space-2);
+    display: none;
+    place-items: center;
+    border: 2px dashed var(--sl-color-accent);
+    border-radius: var(--sl-radius-md);
+    background-color: color-mix(in oklch, var(--sl-color-accent-soft) 85%, transparent);
+    color: var(--sl-color-accent-soft-fg);
+    font-weight: var(--sl-weight-medium);
+    pointer-events: none;
+  }
+  .sl-md-editor[data-dragging] .sl-md-drop-hint { display: grid; }
+
+  .sl-md-preview {
+    display: none;
+    padding: var(--sl-space-4);
+    min-block-size: calc(var(--sl-md-rows, 8) * 1.5em + var(--sl-space-6));
+    max-block-size: 70vh;
+    overflow: auto;
+    > .sl-prose { max-inline-size: none; }
+    > .sl-md-empty { color: var(--sl-color-fg-subtle); font-size: var(--sl-text-sm); }
+  }
+  .sl-md-editor[data-preview] .sl-md-preview { display: block; }
+
+  .sl-md-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sl-space-3);
+    padding: var(--sl-space-2) var(--sl-space-3);
+    border-block-start: 1px solid var(--sl-color-border);
+    color: var(--sl-color-fg-subtle);
+    font-size: var(--sl-text-xs);
+    > span > svg { display: inline-block; vertical-align: -0.2em; }
+    > .sl-md-count { margin-inline-start: auto; font-variant-numeric: tabular-nums; }
+    > .sl-upload-entries { flex-basis: 100%; }
+  }
+}

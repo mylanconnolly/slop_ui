@@ -1,0 +1,81 @@
+/*
+ * Accordion on native <details>. `name` gives exclusive behaviour for free.
+ * Open/close animates via the ::details-content grid trick; browsers without
+ * ::details-content just toggle.
+ */
+@layer sl.components {
+  .sl-accordion {
+    display: flex;
+    flex-direction: column;
+    border-block-start: 1px solid var(--sl-color-border);
+
+    &[data-variant="separated"] {
+      gap: var(--sl-space-2);
+      border: 0;
+      > .sl-accordion-item {
+        border: 1px solid var(--sl-color-border);
+        border-radius: var(--sl-radius-lg);
+        background-color: var(--sl-color-surface);
+      }
+    }
+  }
+
+  .sl-accordion-item {
+    border-block-end: 1px solid var(--sl-color-border);
+
+    &::details-content {
+      display: grid;
+      grid-template-rows: 0fr;
+      overflow: hidden;
+      transition:
+        grid-template-rows var(--sl-duration-slow) var(--sl-ease),
+        content-visibility var(--sl-duration-slow) allow-discrete;
+    }
+    &[open]::details-content { grid-template-rows: 1fr; }
+  }
+
+  .sl-accordion-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sl-space-3);
+    padding: var(--sl-space-4);
+    font-weight: var(--sl-weight-medium);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    border-radius: inherit;
+
+    &::-webkit-details-marker { display: none; }
+    &:hover { color: var(--sl-color-accent-text); }
+    &:focus-visible { outline-offset: -2px; }
+
+    > svg {
+      flex: none;
+      inline-size: 1rem;
+      block-size: 1rem;
+      color: var(--sl-color-fg-muted);
+      transition: rotate var(--sl-duration) var(--sl-ease);
+    }
+  }
+
+  .sl-accordion-item[open] > .sl-accordion-trigger > svg {
+    rotate: 180deg;
+  }
+
+  /*
+   * The grid item must have zero intrinsic size or the 0fr row can't collapse
+   * and the animation snaps by the padding amount at each end. So the item
+   * only clips, and the padding lives on the body inside it.
+   */
+  .sl-accordion-content {
+    min-block-size: 0;
+    overflow: hidden;
+  }
+
+  .sl-accordion-body {
+    padding: 0 var(--sl-space-4) var(--sl-space-4);
+    color: var(--sl-color-fg-muted);
+    font-size: var(--sl-text-sm);
+  }
+}

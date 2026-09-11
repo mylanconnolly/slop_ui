@@ -1,0 +1,96 @@
+/*
+ * Avatar.
+ *   data-size:  xs | sm | md (default) | lg | xl
+ *   data-shape: circle (default) | square
+ *   data-color: accent | neutral | success | warning | danger | info (default: hue from name)
+ *   .sl-avatar-status[data-status]: online | offline | busy | away
+ */
+@layer sl.components {
+  .sl-avatar {
+    --_size: 2.5rem;
+    /* Hashed hue from the name; kept low-chroma so any hue reads well. */
+    --_hue: var(--sl-hue-accent);
+    --_bg: light-dark(oklch(92% 0.06 var(--_hue)), oklch(32% 0.08 var(--_hue)));
+    --_fg: light-dark(oklch(35% 0.12 var(--_hue)), oklch(90% 0.06 var(--_hue)));
+
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--_size);
+    block-size: var(--_size);
+    flex: none;
+    border-radius: var(--sl-avatar-radius, var(--sl-radius-full));
+    background-color: var(--_bg);
+    color: var(--_fg);
+    font-size: calc(var(--_size) * 0.38);
+    font-weight: var(--sl-weight-medium);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    user-select: none;
+    vertical-align: middle;
+
+    > * { grid-area: 1 / 1; }
+
+    > img {
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      border-radius: inherit;
+    }
+
+    > svg.sl-avatar-fallback { inline-size: 55%; block-size: 55%; }
+
+    &[data-shape="square"] { border-radius: var(--sl-avatar-radius, var(--sl-radius-md)); }
+
+    &[data-size="xs"] { --_size: 1.5rem; }
+    &[data-size="sm"] { --_size: 2rem; }
+    &[data-size="lg"] { --_size: 3rem; }
+    &[data-size="xl"] { --_size: 4rem; }
+
+    &[data-color="neutral"] { --_bg: var(--sl-color-neutral-soft); --_fg: var(--sl-color-neutral-soft-fg); }
+    &[data-color="accent"]  { --_bg: var(--sl-color-accent-soft);  --_fg: var(--sl-color-accent-soft-fg); }
+    &[data-color="success"] { --_bg: var(--sl-color-success-soft); --_fg: var(--sl-color-success-soft-fg); }
+    &[data-color="warning"] { --_bg: var(--sl-color-warning-soft); --_fg: var(--sl-color-warning-soft-fg); }
+    &[data-color="danger"]  { --_bg: var(--sl-color-danger-soft);  --_fg: var(--sl-color-danger-soft-fg); }
+    &[data-color="info"]    { --_bg: var(--sl-color-info-soft);    --_fg: var(--sl-color-info-soft-fg); }
+  }
+
+  /* Status dot, ringed with the surface color so it reads on any avatar. */
+  .sl-avatar-status {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-end: 0;
+    inline-size: max(0.5rem, calc(var(--_size) * 0.28));
+    block-size: max(0.5rem, calc(var(--_size) * 0.28));
+    border-radius: var(--sl-radius-full);
+    box-shadow: 0 0 0 2px var(--sl-color-surface);
+    background-color: var(--sl-color-fg-subtle);
+
+    /* Shape carries meaning too, so red/green isn't the only cue: solid = online,
+       dash = busy, ring = away, hollow grey = offline. */
+    display: grid;
+    place-items: center;
+    &[data-status="online"]  { background-color: var(--sl-color-success); }
+    &[data-status="busy"]    { background-color: var(--sl-color-danger); &::after { content: ""; inline-size: 50%; block-size: 2px; background: var(--sl-color-surface); border-radius: 1px; } }
+    &[data-status="away"]    { background-color: var(--sl-color-surface); box-shadow: 0 0 0 2px var(--sl-color-surface), inset 0 0 0 2.5px var(--sl-color-warning); }
+    &[data-status="offline"] { background-color: var(--sl-color-surface); box-shadow: 0 0 0 2px var(--sl-color-surface), inset 0 0 0 2px var(--sl-color-fg-subtle); }
+
+    [data-shape="square"] > & { translate: 25% 25%; }
+  }
+
+  .sl-avatar-group {
+    display: inline-flex;
+    align-items: center;
+
+    > .sl-avatar {
+      box-shadow: 0 0 0 2px var(--sl-color-surface);
+      &:not(:first-child) { margin-inline-start: calc(var(--_size) * -0.3); }
+    }
+  }
+
+  .sl-avatar-overflow {
+    --_bg: var(--sl-color-neutral-soft);
+    --_fg: var(--sl-color-fg-muted);
+    font-size: calc(var(--_size) * 0.32);
+  }
+}

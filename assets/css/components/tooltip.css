@@ -1,0 +1,52 @@
+/*
+ * Tooltip. Pure CSS: shows on hover and on focus-visible of the trigger.
+ * The text lives in a data attribute rendered via ::after, AND the trigger
+ * gets an aria-label/aria-describedby from the component so AT users are
+ * not left out. Uses anchor positioning where available (with a fallback
+ * to plain absolute positioning above the trigger).
+ */
+@layer sl.components {
+  /* Must generate a box: anchor-name on a display:contents element anchors nothing. */
+  .sl-tooltip-trigger {
+    display: inline-block;
+  }
+
+  .sl-tooltip {
+    position: fixed;
+    inset: auto;
+    z-index: 1;
+    max-inline-size: 18rem;
+    padding: var(--sl-space-1) var(--sl-space-2);
+    border-radius: var(--sl-radius-sm);
+    background-color: var(--sl-color-neutral);
+    color: var(--sl-color-neutral-fg);
+    font-size: var(--sl-text-xs);
+    line-height: 1.4;
+    text-wrap: balance;
+    pointer-events: none;
+    opacity: 0;
+    scale: 0.96;
+    transition:
+      opacity var(--sl-duration-fast) var(--sl-ease),
+      scale var(--sl-duration-fast) var(--sl-ease),
+      display var(--sl-duration-fast) allow-discrete,
+      overlay var(--sl-duration-fast) allow-discrete;
+
+    &:popover-open {
+      opacity: 1;
+      scale: 1;
+      @starting-style { opacity: 0; scale: 0.96; }
+    }
+
+    @supports (anchor-name: none) {
+      position-anchor: var(--sl-anchor);
+      position-area: block-start;
+      margin-block-end: var(--sl-space-2);
+      position-try-fallbacks: flip-block;
+
+      &[data-placement="bottom"] { position-area: block-end; margin-block: var(--sl-space-2) 0; }
+      &[data-placement="left"]   { position-area: inline-start; margin-inline-end: var(--sl-space-2); margin-block: 0; }
+      &[data-placement="right"]  { position-area: inline-end; margin-inline-start: var(--sl-space-2); margin-block: 0; }
+    }
+  }
+}

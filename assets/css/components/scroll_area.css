@@ -1,0 +1,87 @@
+/*
+ * Scroll area: thin scrollbars everywhere, edge shadows where the browser
+ * supports scroll-driven animations (no JS, no layout work).
+ */
+@layer sl.components {
+  .sl-scroll-area {
+    position: relative;
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--sl-color-border-strong) transparent;
+    scrollbar-gutter: stable;
+
+    &[data-orientation="horizontal"] { overflow: auto hidden; }
+    &[data-orientation="both"] { overflow: auto; }
+
+    &:focus-visible { outline-offset: 2px; }
+
+    /* Fallback for engines without scrollbar-width (older WebKit). */
+    @supports not (scrollbar-width: thin) {
+      &::-webkit-scrollbar { inline-size: 0.5rem; block-size: 0.5rem; }
+      &::-webkit-scrollbar-thumb { background-color: var(--sl-color-border-strong); border-radius: var(--sl-radius-full); }
+      &::-webkit-scrollbar-track { background: transparent; }
+    }
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .sl-scroll-area[data-shadows]:not([data-orientation="horizontal"]) {
+      &::before,
+      &::after {
+        content: "";
+        position: sticky;
+        display: block;
+        inset-inline: 0;
+        block-size: 1rem;
+        z-index: 1;
+        pointer-events: none;
+        animation: sl-scroll-shadow linear both;
+        animation-timeline: scroll(nearest block);
+      }
+      &::before {
+        inset-block-start: 0;
+        margin-block-end: -1rem;
+        background: linear-gradient(to bottom, color-mix(in oklch, var(--sl-shadow-color) 12%, transparent), transparent);
+        animation-range: 0 2rem;
+      }
+      &::after {
+        inset-block-end: 0;
+        margin-block-start: -1rem;
+        background: linear-gradient(to top, color-mix(in oklch, var(--sl-shadow-color) 12%, transparent), transparent);
+        animation-name: sl-scroll-shadow-end;
+        animation-range: calc(100% - 2rem) 100%;
+      }
+    }
+
+    .sl-scroll-area[data-shadows][data-orientation="horizontal"] {
+      display: flex;
+      &::before,
+      &::after {
+        content: "";
+        position: sticky;
+        flex: none;
+        inline-size: 1rem;
+        z-index: 1;
+        pointer-events: none;
+        animation: sl-scroll-shadow linear both;
+        animation-timeline: scroll(nearest inline);
+      }
+      &::before {
+        inset-inline-start: 0;
+        margin-inline-end: -1rem;
+        background: linear-gradient(to right, color-mix(in oklch, var(--sl-shadow-color) 12%, transparent), transparent);
+        animation-range: 0 2rem;
+      }
+      &::after {
+        inset-inline-end: 0;
+        margin-inline-start: -1rem;
+        background: linear-gradient(to left, color-mix(in oklch, var(--sl-shadow-color) 12%, transparent), transparent);
+        animation-name: sl-scroll-shadow-end;
+        animation-range: calc(100% - 2rem) 100%;
+      }
+    }
+  }
+
+  @keyframes sl-scroll-shadow { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes sl-scroll-shadow-end { from { opacity: 1; } to { opacity: 0; } }
+}

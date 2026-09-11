@@ -1,0 +1,57 @@
+/*
+ * Badge / pill.
+ *   data-variant: soft (default) | solid | outline
+ *   data-color:   neutral (default) | accent | success | warning | danger | info
+ *   data-size:    sm | md (default)
+ */
+@layer sl.components {
+  .sl-badge {
+    --_solid: var(--sl-color-neutral);
+    --_solid-fg: var(--sl-color-neutral-fg);
+    --_soft: var(--sl-color-neutral-soft);
+    --_soft-fg: var(--sl-color-neutral-soft-fg);
+    --_text: var(--sl-color-neutral-text);
+
+    --_bg: var(--_soft);
+    --_fg: var(--_soft-fg);
+    --_border: transparent;
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sl-space-1);
+    padding-inline: var(--sl-space-2);
+    padding-block: 0.125rem;
+    border: 1px solid var(--_border);
+    border-radius: var(--sl-badge-radius, var(--sl-radius-full));
+    background-color: var(--_bg);
+    color: var(--_fg);
+    font-size: var(--sl-text-xs);
+    font-weight: var(--sl-weight-medium);
+    line-height: 1.4;
+    white-space: nowrap;
+
+    &[data-color="accent"]  { --_solid: var(--sl-color-accent);  --_solid-fg: var(--sl-color-accent-fg);  --_soft: var(--sl-color-accent-soft);  --_soft-fg: var(--sl-color-accent-soft-fg);  --_text: var(--sl-color-accent-text); }
+    &[data-color="success"] { --_solid: var(--sl-color-success); --_solid-fg: var(--sl-color-success-fg); --_soft: var(--sl-color-success-soft); --_soft-fg: var(--sl-color-success-soft-fg); --_text: var(--sl-color-success-text); }
+    &[data-color="warning"] { --_solid: var(--sl-color-warning); --_solid-fg: var(--sl-color-warning-fg); --_soft: var(--sl-color-warning-soft); --_soft-fg: var(--sl-color-warning-soft-fg); --_text: var(--sl-color-warning-text); }
+    &[data-color="danger"]  { --_solid: var(--sl-color-danger);  --_solid-fg: var(--sl-color-danger-fg);  --_soft: var(--sl-color-danger-soft);  --_soft-fg: var(--sl-color-danger-soft-fg);  --_text: var(--sl-color-danger-text); }
+    &[data-color="info"]    { --_solid: var(--sl-color-info);    --_solid-fg: var(--sl-color-info-fg);    --_soft: var(--sl-color-info-soft);    --_soft-fg: var(--sl-color-info-soft-fg);    --_text: var(--sl-color-info-text); }
+
+    &[data-variant="solid"]   { --_bg: var(--_solid); --_fg: var(--_solid-fg); }
+    &[data-variant="outline"] { --_bg: transparent; --_fg: var(--_text); --_border: currentColor; }
+
+    &[data-size="sm"] {
+      padding-inline: var(--sl-space-1);
+      padding-block: 0;
+      font-size: 0.6875rem;
+    }
+
+    /* Status dot */
+    &[data-dot]::before {
+      content: "";
+      inline-size: 0.5em;
+      block-size: 0.5em;
+      border-radius: var(--sl-radius-full);
+      background-color: currentColor;
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "slop_ui",
+  "version": "0.1.0",
+  "description": "Semantic, themeable, accessible components for Phoenix LiveView.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./assets/js/index.js",
+  "module": "./assets/js/index.js",
+  "exports": {
+    ".": "./assets/js/index.js",
+    "./css": "./assets/css/slop_ui.css",
+    "./assets/css/*": "./assets/css/*"
+  },
+  "files": ["assets/js", "assets/css", "priv/phosphor/LICENSE"]
+}

@@ -1,0 +1,96 @@
+/*
+ * Radio / checkbox groups, toggle buttons and toggle groups.
+ */
+@layer sl.components {
+  /* ---- Groups of choices ---- */
+  .sl-choice-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sl-space-2);
+
+    &[data-orientation="horizontal"] {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--sl-space-4);
+    }
+
+    /* Card variant: each choice is a bordered, selectable box. */
+    &[data-variant="cards"] {
+      gap: var(--sl-space-3);
+      &[data-orientation="horizontal"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
+
+      > .sl-choice {
+        align-items: flex-start;
+        padding: var(--sl-space-3) var(--sl-space-4);
+        border: 1px solid var(--sl-color-border);
+        border-radius: var(--sl-radius-lg);
+        background-color: var(--sl-color-surface);
+        transition: border-color var(--sl-duration-fast) var(--sl-ease), background-color var(--sl-duration-fast) var(--sl-ease);
+
+        &:hover { border-color: var(--sl-color-border-strong); }
+        &:has(:checked) { border-color: var(--sl-color-accent); background-color: var(--sl-color-accent-soft); }
+        &:has(:focus-visible) { outline: var(--sl-focus-ring); outline-offset: var(--sl-focus-offset); }
+        &:has(:disabled) { opacity: 0.6; }
+      }
+    }
+  }
+
+  .sl-choice-label { font-weight: var(--sl-weight-medium); }
+  .sl-choice-description {
+    display: block;
+    color: var(--sl-color-fg-muted);
+    font-size: var(--sl-text-xs);
+    font-weight: var(--sl-weight-normal);
+  }
+
+  /* ---- Toggle button (aria-pressed) ---- */
+  .sl-button[aria-pressed="true"] {
+    --_bg: var(--_soft);
+    --_bg-hover: var(--_soft-hover);
+    --_bg-active: var(--_soft-hover);
+    --_fg: var(--_soft-fg);
+    --_border: transparent;
+  }
+
+  /* ---- Toggle group: real radios/checkboxes styled as a segmented control ---- */
+  .sl-toggle-group {
+    display: inline-flex;
+    gap: 0.125rem;
+    padding: 0.1875rem;
+    border: 1px solid var(--sl-color-border);
+    border-radius: var(--sl-control-radius);
+    background-color: var(--sl-color-surface-sunken);
+    margin: 0;
+    min-inline-size: 0;
+
+    > legend { position: absolute; clip-path: inset(50%); }
+
+    > label {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sl-space-1);
+      min-inline-size: var(--sl-control-height-sm);
+      min-block-size: calc(var(--sl-control-height-sm) - 0.125rem);
+      padding-inline: var(--sl-space-3);
+      border-radius: calc(var(--sl-control-radius) - 0.1875rem);
+      color: var(--sl-color-fg-muted);
+      font-size: var(--sl-text-sm);
+      font-weight: var(--sl-weight-medium);
+      cursor: pointer;
+      user-select: none;
+      transition: background-color var(--sl-duration-fast) var(--sl-ease), color var(--sl-duration-fast) var(--sl-ease);
+
+      > svg { inline-size: 1rem; block-size: 1rem; }
+      > input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: inherit; }
+
+      &:hover { color: var(--sl-color-fg); }
+      &:has(:checked) { background-color: var(--sl-color-surface-raised); color: var(--sl-color-fg); box-shadow: var(--sl-shadow-sm); }
+      &:has(:focus-visible) { outline: var(--sl-focus-ring); outline-offset: 1px; }
+      &:has(:disabled) { opacity: 0.5; cursor: not-allowed; }
+    }
+
+    &[data-size="md"] > label { min-block-size: calc(var(--sl-control-height-md) - 0.5rem); padding-inline: var(--sl-space-4); }
+  }
+}

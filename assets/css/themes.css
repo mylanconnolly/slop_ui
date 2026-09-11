@@ -1,0 +1,66 @@
+/*
+ * Colour presets. Opt in by importing this file after slop_ui.css, then set
+ * data-palette on <html> (or any subtree). Each preset only changes hues and
+ * chroma; every lightness value stays as audited, so the AA pairings hold.
+ * Semantic hues are spread so accent, danger and warning stay distinguishable
+ * under red-green colour vision deficiency (checked by `mix sink.audit`).
+ *
+ *   warm (default)  stone neutrals, purple accent
+ *   cool            cool grey neutrals, indigo accent (info moves to cyan)
+ *   slate           blue-grey neutrals, teal accent (info moves to blue-violet)
+ *   forest          sage neutrals, green accent (success moves toward yellow-green)
+ *   ocean           blue-grey neutrals, blue accent (info moves to cyan)
+ *   mono            achromatic neutrals, the foreground colour as the accent
+ */
+@layer sl.tokens {
+  [data-palette="warm"] {
+    --sl-hue-neutral: 70;  --sl-neutral-chroma: 0.016;
+    --sl-hue-accent: 305;  --sl-accent-chroma: 0.18;
+    --sl-hue-success: 145; --sl-hue-warning: 85; --sl-hue-danger: 20; --sl-hue-info: 240;
+  }
+
+  [data-palette="cool"] {
+    --sl-hue-neutral: 260; --sl-neutral-chroma: 0.012;
+    --sl-hue-accent: 262;  --sl-accent-chroma: 0.19;
+    --sl-hue-success: 128; --sl-hue-warning: 85; --sl-hue-danger: 20; --sl-hue-info: 205;
+    /* With a blue accent, info is set apart by lightness as well as hue. */
+    --sl-color-info: light-dark(oklch(32% 0.13 var(--sl-hue-info)), oklch(80% 0.11 var(--sl-hue-info)));
+    --sl-color-info-fg: light-dark(oklch(100% 0 0), oklch(15% 0.03 var(--sl-hue-info)));
+  }
+
+  [data-palette="slate"] {
+    --sl-hue-neutral: 230; --sl-neutral-chroma: 0.014;
+    --sl-hue-accent: 190;  --sl-accent-chroma: 0.13;
+    --sl-hue-success: 145; --sl-hue-warning: 85; --sl-hue-danger: 20; --sl-hue-info: 265;
+  }
+
+  [data-palette="forest"] {
+    --sl-hue-neutral: 120; --sl-neutral-chroma: 0.012;
+    --sl-hue-accent: 165;  --sl-accent-chroma: 0.14;
+    --sl-hue-success: 125; --sl-hue-warning: 80; --sl-hue-danger: 20; --sl-hue-info: 240;
+  }
+
+  [data-palette="ocean"] {
+    --sl-hue-neutral: 240; --sl-neutral-chroma: 0.012;
+    --sl-hue-accent: 235;  --sl-accent-chroma: 0.17;
+    --sl-hue-success: 128; --sl-hue-warning: 85; --sl-hue-danger: 20; --sl-hue-info: 200;
+    --sl-color-info: light-dark(oklch(32% 0.12 var(--sl-hue-info)), oklch(80% 0.11 var(--sl-hue-info)));
+    --sl-color-info-fg: light-dark(oklch(100% 0 0), oklch(15% 0.03 var(--sl-hue-info)));
+  }
+
+  [data-palette="mono"] {
+    --sl-hue-neutral: 70;  --sl-neutral-chroma: 0;
+    --sl-accent-chroma: 0;
+    /* The accent family becomes the neutral solid; semantic colours keep their hues. */
+    --sl-color-accent: var(--sl-color-neutral);
+    --sl-color-accent-hover: var(--sl-color-neutral-hover);
+    --sl-color-accent-active: var(--sl-color-neutral-active);
+    --sl-color-accent-fg: var(--sl-color-neutral-fg);
+    --sl-color-accent-soft: var(--sl-color-neutral-soft);
+    --sl-color-accent-soft-hover: var(--sl-color-neutral-soft-hover);
+    --sl-color-accent-soft-fg: var(--sl-color-neutral-soft-fg);
+    --sl-color-accent-text: var(--sl-color-fg);
+    --sl-color-focus: var(--sl-color-fg);
+    --sl-hue-success: 145; --sl-hue-warning: 85; --sl-hue-danger: 20; --sl-hue-info: 240;
+  }
+}

@@ -1,0 +1,303 @@
+/*
+ * Pin input, tag input, rating, stepper, timeline, stat, collapsible, copy button.
+ */
+@layer sl.components {
+  /* ---- Pin input ---- */
+  .sl-pin {
+    display: inline-flex;
+    gap: var(--sl-space-2);
+
+    > input {
+      inline-size: var(--sl-control-height-md);
+      block-size: calc(var(--sl-control-height-md) * 1.2);
+      padding: 0;
+      border: 1px solid var(--sl-color-border-strong);
+      border-radius: var(--sl-input-radius, var(--sl-control-radius));
+      background-color: var(--sl-color-surface);
+      color: var(--sl-color-fg);
+      box-shadow: var(--sl-input-shadow, none);
+      font-size: var(--sl-text-xl);
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+      caret-color: var(--sl-color-accent);
+      transition: border-color var(--sl-duration-fast) var(--sl-ease);
+
+      &:focus-visible { border-color: var(--sl-color-focus); outline: var(--sl-focus-ring); outline-offset: 0; }
+      &:disabled { opacity: 0.6; background-color: var(--sl-color-surface-sunken); }
+      &[aria-invalid="true"] { border-color: var(--sl-color-danger); }
+    }
+    > .sl-pin-sep { align-self: center; color: var(--sl-color-fg-subtle); }
+  }
+
+  /* ---- Tag input ---- */
+  .sl-tag-input {
+    --_border: var(--sl-color-border-strong);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sl-space-1);
+    min-block-size: var(--sl-control-height-md);
+    padding: var(--sl-space-1) var(--sl-space-2);
+    border: 1px solid var(--_border);
+    border-radius: var(--sl-input-radius, var(--sl-control-radius));
+    background-color: var(--sl-color-surface);
+    box-shadow: var(--sl-input-shadow, none);
+    cursor: text;
+    transition: border-color var(--sl-duration-fast) var(--sl-ease);
+
+    &:hover { --_border: color-mix(in oklch, var(--sl-color-border-strong), var(--sl-color-fg) 20%); }
+    &:has(:focus-visible) { --_border: var(--sl-color-focus); outline: var(--sl-focus-ring); outline-offset: 0; }
+    &[aria-invalid="true"] { --_border: var(--sl-color-danger); }
+    &:has(:disabled) { opacity: 0.6; background-color: var(--sl-color-surface-sunken); }
+
+    > input {
+      flex: 1;
+      min-inline-size: 6rem;
+      min-block-size: calc(var(--sl-control-height-md) - var(--sl-space-2) - 2px);
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font-size: var(--sl-text-sm);
+      &::placeholder { color: var(--sl-color-fg-subtle); }
+      &:focus-visible { outline: none; }
+    }
+  }
+
+  /* ---- Rating ---- */
+  .sl-rating {
+    display: inline-flex;
+    gap: 0.125rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-inline-size: 0;
+    color: var(--sl-color-warning);
+    --_size: 1.5rem;
+
+    > legend { position: absolute; clip-path: inset(50%); }
+
+    > label {
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      inline-size: var(--_size);
+      block-size: var(--_size);
+      cursor: pointer;
+      > input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: inherit; }
+      > svg { inline-size: 100%; block-size: 100%; fill: none; transition: fill var(--sl-duration-fast) var(--sl-ease), scale var(--sl-duration-fast) var(--sl-ease-spring); }
+      &:has(:focus-visible) { outline: var(--sl-focus-ring); outline-offset: 2px; border-radius: var(--sl-radius-sm); }
+      &:hover > svg { scale: 1.15; }
+    }
+
+    /* Fill every star up to and including the checked one; hover previews. */
+    > label:has(:checked) > svg,
+    > label:has(~ label :checked) > svg { fill: currentColor; }
+    &:hover > label > svg { fill: none; }
+    &:hover > label:hover > svg,
+    &:hover > label:has(~ label:hover) > svg { fill: currentColor; }
+
+    > .sl-rating-star { display: inline-grid; place-items: center; inline-size: var(--_size); block-size: var(--_size); > svg { inline-size: 100%; block-size: 100%; fill: none; } &[data-filled] > svg { fill: currentColor; } }
+
+    &[data-size="sm"] { --_size: 1.125rem; }
+    &[data-size="lg"] { --_size: 2rem; }
+    &:has(:disabled) { opacity: 0.6; > label { cursor: not-allowed; } }
+  }
+  .sl-rating-value { margin-inline-start: var(--sl-space-2); color: var(--sl-color-fg-muted); font-size: var(--sl-text-sm); align-self: center; }
+
+  /* ---- Stepper ---- */
+  .sl-stepper {
+    display: flex;
+    gap: var(--sl-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+
+    &[data-orientation="vertical"] { flex-direction: column; gap: 0; }
+  }
+
+  .sl-step {
+    --_ring: var(--sl-color-border-strong);
+    --_fg: var(--sl-color-fg-muted);
+    position: relative;
+    display: flex;
+    flex: 1;
+    gap: var(--sl-space-3);
+    align-items: flex-start;
+    min-inline-size: 0;
+    font-size: var(--sl-text-sm);
+    counter-increment: step;
+
+    &[data-state="complete"] { --_ring: var(--sl-color-accent); --_fg: var(--sl-color-fg); }
+    &[data-state="current"]  { --_ring: var(--sl-color-accent); --_fg: var(--sl-color-fg); }
+
+    /* Horizontal: marker row on top with the connector, label underneath. */
+    [data-orientation="horizontal"] > & { flex-direction: column; gap: var(--sl-space-2); }
+    [data-orientation="vertical"] > & { flex: none; padding-block-end: var(--sl-space-6); }
+    [data-orientation="vertical"] > &:last-child { padding-block-end: 0; }
+  }
+
+  /* Connector to the next step. Written flat: `&` can't stand for a pseudo-element. */
+  .sl-step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    background-color: var(--sl-color-border);
+  }
+  .sl-stepper[data-orientation="horizontal"] > .sl-step:not(:last-child)::after {
+    inset-block-start: calc(1rem - 1px);
+    inset-inline-start: calc(2rem + var(--sl-space-2));
+    inset-inline-end: var(--sl-space-2);
+    block-size: 2px;
+  }
+  .sl-stepper[data-orientation="vertical"] > .sl-step:not(:last-child)::after {
+    inset-inline-start: calc(1rem - 1px);
+    inset-block-start: 2.25rem;
+    inset-block-end: 0.25rem;
+    inline-size: 2px;
+  }
+  .sl-step[data-state="complete"]:not(:last-child)::after { background-color: var(--sl-color-accent); }
+
+  .sl-step-marker {
+    flex: none;
+    display: grid;
+    place-items: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border: 2px solid var(--_ring);
+    border-radius: var(--sl-radius-full);
+    background-color: var(--sl-color-surface);
+    color: var(--_fg);
+    font-size: var(--sl-text-xs);
+    font-weight: var(--sl-weight-semibold);
+    z-index: 1;
+
+    &::before { content: counter(step); }
+    > svg { inline-size: 1rem; block-size: 1rem; }
+    [data-state="complete"] > & { background-color: var(--sl-color-accent); border-color: var(--sl-color-accent); color: var(--sl-color-accent-fg); &::before { content: none; } }
+    [data-state="current"] > & { box-shadow: 0 0 0 4px var(--sl-color-accent-soft); color: var(--sl-color-accent-text); }
+  }
+
+  /* Optional: the current marker breathes while a long-running task advances. */
+  .sl-stepper[data-pulse] > .sl-step[data-state="current"] > .sl-step-marker {
+    position: relative;
+    &::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      border: 2px solid var(--sl-color-accent);
+      opacity: 0;
+      animation: sl-step-pulse 1.8s var(--sl-ease-out) infinite;
+    }
+  }
+  @keyframes sl-step-pulse {
+    0%   { scale: 1; opacity: 0.7; }
+    70%  { scale: 1.6; opacity: 0; }
+    100% { scale: 1.6; opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sl-stepper[data-pulse] > .sl-step[data-state="current"] > .sl-step-marker::after {
+      animation: none;
+      scale: 1.25;
+      opacity: 0.5;
+    }
+  }
+  .sl-step-body { min-inline-size: 0; }
+  .sl-stepper[data-orientation="vertical"] .sl-step-body { padding-block-start: 0.375rem; }
+  .sl-step-title { color: var(--_fg); font-weight: var(--sl-weight-medium); }
+  .sl-step-description { color: var(--sl-color-fg-subtle); font-size: var(--sl-text-xs); }
+
+  /* ---- Timeline ---- */
+  .sl-timeline {
+    --_gap: var(--sl-space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--_gap);
+  }
+  .sl-timeline-item {
+    --_accent: var(--sl-color-fg-subtle);
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.5rem 1fr;
+    gap: var(--sl-space-3);
+    font-size: var(--sl-text-sm);
+
+    &[data-color="accent"]  { --_accent: var(--sl-color-accent); }
+    &[data-color="success"] { --_accent: var(--sl-color-success); }
+    &[data-color="warning"] { --_accent: var(--sl-color-warning); }
+    &[data-color="danger"]  { --_accent: var(--sl-color-danger); }
+    &[data-color="info"]    { --_accent: var(--sl-color-info); }
+  }
+  /* The connector is drawn per item, from below its marker to the next marker,
+     so no mask is needed and it works on any background. */
+  .sl-timeline-item:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: calc(0.75rem - 1px);
+    inset-block-start: calc(1.5rem + 0.25rem);
+    inset-block-end: calc(var(--_gap) * -1 + 0.25rem);
+    inline-size: 2px;
+    border-radius: 1px;
+    background-color: var(--sl-color-border);
+  }
+  .sl-timeline-marker {
+    display: grid;
+    place-items: center;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    color: var(--_accent);
+    &::before { content: ""; inline-size: 0.625rem; block-size: 0.625rem; border-radius: var(--sl-radius-full); background-color: var(--_accent); }
+    &:has(> svg)::before { content: none; }
+    > svg { inline-size: 1rem; block-size: 1rem; }
+  }
+  .sl-timeline-body { min-inline-size: 0; }
+  .sl-timeline-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--sl-space-2); }
+  .sl-timeline-title { font-weight: var(--sl-weight-medium); }
+  .sl-timeline-time { color: var(--sl-color-fg-subtle); font-size: var(--sl-text-xs); white-space: nowrap; }
+  .sl-timeline-content { margin-block-start: var(--sl-space-1); color: var(--sl-color-fg-muted); }
+
+  /* ---- Stat ---- */
+  .sl-stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sl-space-1);
+    padding: var(--sl-space-5);
+    border: 1px solid var(--sl-color-border);
+    border-radius: var(--sl-radius-lg);
+    background-color: var(--sl-color-surface);
+    min-inline-size: 0;
+  }
+  .sl-stat-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sl-space-2); color: var(--sl-color-fg-muted); font-size: var(--sl-text-sm); > svg { inline-size: 1.125rem; block-size: 1.125rem; } }
+  .sl-stat-value { font-size: var(--sl-text-3xl); font-weight: var(--sl-weight-semibold); letter-spacing: -0.02em; line-height: var(--sl-leading-tight); font-variant-numeric: tabular-nums; }
+  .sl-stat-foot { display: flex; align-items: center; gap: var(--sl-space-2); font-size: var(--sl-text-xs); color: var(--sl-color-fg-subtle); }
+  .sl-stat-delta {
+    display: inline-flex; align-items: center; gap: 0.125rem;
+    font-weight: var(--sl-weight-medium);
+    &[data-trend="up"]   { color: var(--sl-color-success-text); }
+    &[data-trend="down"] { color: var(--sl-color-danger-text); }
+    > svg { inline-size: 0.875rem; block-size: 0.875rem; }
+    &[data-trend="down"] > svg { rotate: 180deg; }
+  }
+
+  /* ---- Collapsible (single details) ---- */
+  .sl-collapsible {
+    &::details-content {
+      display: grid;
+      grid-template-rows: 0fr;
+      overflow: hidden;
+      transition: grid-template-rows var(--sl-duration) var(--sl-ease), content-visibility var(--sl-duration) allow-discrete;
+    }
+    &[open]::details-content { grid-template-rows: 1fr; }
+    > summary { list-style: none; cursor: pointer; display: inline-flex; &::-webkit-details-marker { display: none; } }
+    > summary > .sl-button > svg:last-child { transition: rotate var(--sl-duration) var(--sl-ease); }
+    &[open] > summary > .sl-button > svg:last-child { rotate: 180deg; }
+  }
+  .sl-collapsible-content { min-block-size: 0; overflow: hidden; }
+  .sl-collapsible-body { padding-block-start: var(--sl-space-3); }
+
+  /* ---- Copy button ---- */
+  .sl-copy[data-copied] { --_fg: var(--sl-color-success-text); }
+}

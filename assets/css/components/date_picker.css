@@ -1,0 +1,194 @@
+/*
+ * Date picker: native date input(s) in an input group, plus an anchored
+ * calendar popover rendered by the hook.
+ */
+@layer sl.components {
+  .sl-date-picker {
+    > .sl-input[type="date"] {
+      font-variant-numeric: tabular-nums;
+      &::-webkit-calendar-picker-indicator { display: none; }
+      &::-webkit-datetime-edit { padding: 0; }
+    }
+    > .sl-input-adornment[data-range-sep] { padding-inline: var(--sl-space-1); color: var(--sl-color-fg-subtle); }
+  }
+
+  .sl-calendar {
+    --_cell: 2.25rem;
+    --_offset: var(--sl-space-2);
+
+    position: fixed;
+    inset: auto;
+    inline-size: max-content;
+    padding: var(--sl-space-3);
+    border: 1px solid var(--sl-color-border);
+    border-radius: var(--sl-radius-lg);
+    background-color: var(--sl-color-surface-raised);
+    color: var(--sl-color-fg);
+    box-shadow: var(--sl-shadow-lg);
+    font-size: var(--sl-text-sm);
+
+    opacity: 0;
+    scale: 0.97;
+    transform-origin: top;
+    transition:
+      opacity var(--sl-duration-fast) var(--sl-ease),
+      scale var(--sl-duration-fast) var(--sl-ease),
+      display var(--sl-duration-fast) allow-discrete,
+      overlay var(--sl-duration-fast) allow-discrete;
+    &:popover-open { opacity: 1; scale: 1; @starting-style { opacity: 0; scale: 0.97; } }
+
+    @supports (anchor-name: none) {
+      position-anchor: var(--sl-anchor);
+      position-area: block-end span-inline-end;
+      margin-block-start: var(--_offset);
+      position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    }
+  }
+
+  /* Inline calendar: same grid, in flow, no popover chrome. */
+  .sl-calendar-inline {
+    position: static;
+    inline-size: max-content;
+    opacity: 1;
+    scale: 1;
+    transition: none;
+    box-shadow: none;
+    background-color: var(--sl-color-surface);
+  }
+
+  .sl-calendar-row { display: contents; }
+
+  .sl-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sl-space-2);
+    margin-block-end: var(--sl-space-2);
+  }
+  .sl-calendar-title { flex: 1; text-align: center; font-weight: var(--sl-weight-semibold); }
+
+  .sl-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, var(--_cell));
+    gap: 2px 0;
+  }
+  .sl-calendar-weekday {
+    block-size: var(--_cell);
+    display: grid;
+    place-items: center;
+    color: var(--sl-color-fg-subtle);
+    font-size: var(--sl-text-xs);
+    font-weight: var(--sl-weight-medium);
+  }
+
+  .sl-calendar-day {
+    position: relative;
+    inline-size: var(--_cell);
+    block-size: var(--_cell);
+    display: grid;
+    place-items: center;
+    border-radius: var(--sl-radius-full);
+    color: inherit;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: background-color var(--sl-duration-fast) var(--sl-ease);
+
+    &:hover { background-color: var(--sl-color-neutral-soft); }
+    &:focus-visible { outline: var(--sl-focus-ring); outline-offset: -2px; z-index: 1; }
+    &[data-outside] { color: var(--sl-color-fg-subtle); }
+    &[data-today]::after {
+      content: "";
+      position: absolute;
+      inset-block-end: 0.3rem;
+      inline-size: 0.25rem;
+      block-size: 0.25rem;
+      border-radius: var(--sl-radius-full);
+      background-color: var(--sl-color-accent);
+    }
+    &[aria-disabled="true"] { color: var(--sl-color-fg-subtle); opacity: 0.5; cursor: not-allowed; text-decoration: line-through; background: none; }
+
+    &[data-in-range] { border-radius: 0; background-color: var(--sl-color-accent-soft); color: var(--sl-color-accent-soft-fg); }
+    &[data-range-start] { border-start-start-radius: var(--sl-radius-full); border-end-start-radius: var(--sl-radius-full); }
+    &[data-range-end]   { border-start-end-radius: var(--sl-radius-full); border-end-end-radius: var(--sl-radius-full); }
+
+    &[aria-selected="true"] {
+      background-color: var(--sl-color-accent);
+      color: var(--sl-color-accent-fg);
+      font-weight: var(--sl-weight-semibold);
+      &::after { background-color: var(--sl-color-accent-fg); }
+    }
+  }
+
+  /* Time picker: slot listbox popover. */
+  .sl-time-picker > .sl-input[type="time"] {
+    font-variant-numeric: tabular-nums;
+    &::-webkit-calendar-picker-indicator { display: none; }
+    &::-webkit-datetime-edit { padding: 0; }
+  }
+
+  .sl-time-list {
+    --_offset: var(--sl-space-2);
+
+    position: fixed;
+    inset: auto;
+    inline-size: max-content;
+    min-inline-size: 8rem;
+    max-block-size: 16rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--sl-space-1);
+    border: 1px solid var(--sl-color-border);
+    border-radius: var(--sl-radius-lg);
+    background-color: var(--sl-color-surface-raised);
+    color: var(--sl-color-fg);
+    box-shadow: var(--sl-shadow-lg);
+    font-size: var(--sl-text-sm);
+
+    opacity: 0;
+    scale: 0.97;
+    transform-origin: top;
+    transition:
+      opacity var(--sl-duration-fast) var(--sl-ease),
+      scale var(--sl-duration-fast) var(--sl-ease),
+      display var(--sl-duration-fast) allow-discrete,
+      overlay var(--sl-duration-fast) allow-discrete;
+    &:popover-open { opacity: 1; scale: 1; @starting-style { opacity: 0; scale: 0.97; } }
+
+    @supports (anchor-name: none) {
+      position-anchor: var(--sl-anchor);
+      position-area: block-end span-inline-end;
+      margin-block-start: var(--_offset);
+      position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    }
+  }
+
+  .sl-time-option {
+    display: block;
+    inline-size: 100%;
+    padding: var(--sl-space-2) var(--sl-space-3);
+    border-radius: var(--sl-radius-sm);
+    color: inherit;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+    text-align: start;
+    cursor: pointer;
+    transition: background-color var(--sl-duration-fast) var(--sl-ease);
+
+    &:hover, &:focus-visible { background-color: var(--sl-color-neutral-soft); }
+    &:focus-visible { outline: var(--sl-focus-ring); outline-offset: -2px; }
+    &[aria-selected="true"] {
+      background-color: var(--sl-color-accent);
+      color: var(--sl-color-accent-fg);
+      font-weight: var(--sl-weight-semibold);
+    }
+  }
+
+  .sl-calendar-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sl-space-2);
+    margin-block-start: var(--sl-space-2);
+    padding-block-start: var(--sl-space-2);
+    border-block-start: 1px solid var(--sl-color-border);
+  }
+}

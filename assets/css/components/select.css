@@ -1,0 +1,258 @@
+/*
+ * Select (select-only combobox) and Combobox (editable, with autocomplete).
+ * Both use a popover listbox positioned with anchor positioning.
+ */
+@layer sl.components {
+  .sl-select,
+  .sl-combobox {
+    position: relative;
+    inline-size: 100%;
+  }
+
+  /* The trigger looks like an input. */
+  .sl-select-trigger {
+    --_border: var(--sl-color-border-strong);
+
+    display: flex;
+    align-items: center;
+    gap: var(--sl-space-2);
+    inline-size: 100%;
+    min-block-size: var(--sl-control-height-md);
+    padding-inline: var(--sl-space-3) var(--sl-space-2);
+    padding-block: var(--sl-space-1);
+    border: 1px solid var(--_border);
+    border-radius: var(--sl-input-radius, var(--sl-control-radius));
+    background-color: var(--sl-color-surface);
+    color: var(--sl-color-fg);
+    font-size: var(--sl-text-sm);
+    line-height: var(--sl-leading-tight);
+    text-align: start;
+    box-shadow: var(--sl-input-shadow, none);
+    cursor: pointer;
+    transition: border-color var(--sl-duration-fast) var(--sl-ease);
+
+    &:hover:not([aria-disabled="true"]) { --_border: color-mix(in oklch, var(--sl-color-border-strong), var(--sl-color-fg) 20%); }
+    &:focus-visible { --_border: var(--sl-color-focus); outline: var(--sl-focus-ring); outline-offset: 0; }
+    &[aria-invalid="true"] { --_border: var(--sl-color-danger); }
+    &[aria-disabled="true"] { opacity: 0.6; cursor: not-allowed; background-color: var(--sl-color-surface-sunken); }
+
+    &[data-size="sm"] { min-block-size: var(--sl-control-height-sm); padding-inline-start: var(--sl-space-2); font-size: var(--sl-text-xs); }
+    &[data-size="lg"] { min-block-size: var(--sl-control-height-lg); padding-inline-start: var(--sl-space-4); font-size: var(--sl-text-md); }
+
+    > svg:last-child {
+      flex: none;
+      margin-inline-start: auto;
+      inline-size: 1rem;
+      block-size: 1rem;
+      color: var(--sl-color-fg-muted);
+      transition: rotate var(--sl-duration-fast) var(--sl-ease);
+    }
+    &[aria-expanded="true"] > svg:last-child { rotate: 180deg; }
+  }
+
+  .sl-select-value {
+    flex: 1;
+    min-inline-size: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sl-space-1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &[data-placeholder] { color: var(--sl-color-fg-subtle); }
+  }
+
+  /* Listbox popover */
+  .sl-listbox {
+    --_offset: var(--sl-space-1);
+
+    position: fixed;
+    inset: auto;
+    min-inline-size: anchor-size(width);
+    max-inline-size: min(28rem, calc(100vw - var(--sl-space-8)));
+    max-block-size: min(18rem, calc(100vh - var(--sl-space-8)));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-block: var(--sl-space-1);
+    padding: var(--sl-space-1);
+    border: 1px solid var(--sl-color-border);
+    border-radius: var(--sl-radius-md);
+    background-color: var(--sl-color-surface-raised);
+    color: var(--sl-color-fg);
+    box-shadow: var(--sl-shadow-lg);
+    font-size: var(--sl-text-sm);
+
+    opacity: 0;
+    scale: 0.98;
+    transform-origin: top;
+    transition:
+      opacity var(--sl-duration-fast) var(--sl-ease),
+      scale var(--sl-duration-fast) var(--sl-ease),
+      display var(--sl-duration-fast) allow-discrete,
+      overlay var(--sl-duration-fast) allow-discrete;
+
+    &:popover-open {
+      opacity: 1;
+      scale: 1;
+      @starting-style { opacity: 0; scale: 0.98; }
+    }
+
+    @supports (anchor-name: none) {
+      position-anchor: var(--sl-anchor);
+      position-area: block-end span-inline-end;
+      margin-block-start: var(--_offset);
+      position-try-fallbacks: flip-block;
+    }
+  }
+
+  .sl-option {
+    display: flex;
+    align-items: center;
+    gap: var(--sl-space-2);
+    min-block-size: var(--sl-control-height-sm);
+    padding-inline: var(--sl-space-2);
+    border-radius: var(--sl-radius-sm);
+    cursor: pointer;
+    user-select: none;
+
+    /* Check mark slot keeps labels aligned. */
+    &::before {
+      content: "";
+      flex: none;
+      inline-size: 1rem;
+      block-size: 1rem;
+      background-color: currentColor;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4.5 12.75 6 6 9-13.5'/%3E%3C/svg%3E") center / contain no-repeat;
+      opacity: 0;
+    }
+    &[aria-selected="true"]::before { opacity: 1; }
+    &[aria-selected="true"] { color: var(--sl-color-accent-text); font-weight: var(--sl-weight-medium); }
+
+    &:hover,
+    &[data-active] { background-color: var(--sl-color-neutral-soft); }
+
+    &[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; background: none; }
+    &[hidden] { display: none; }
+
+    mark {
+      background: none;
+      color: var(--sl-color-accent-text);
+      font-weight: var(--sl-weight-semibold);
+    }
+  }
+
+  .sl-option-label {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sl-option-group-label {
+    padding: var(--sl-space-2) var(--sl-space-2) var(--sl-space-1);
+    color: var(--sl-color-fg-subtle);
+    font-size: var(--sl-text-xs);
+    font-weight: var(--sl-weight-medium);
+  }
+
+  .sl-listbox-empty {
+    padding: var(--sl-space-3) var(--sl-space-2);
+    color: var(--sl-color-fg-muted);
+    text-align: center;
+  }
+
+  /* Multi-select chips inside the trigger */
+  .sl-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sl-space-1);
+    padding-inline: var(--sl-space-2) var(--sl-space-1);
+    border-radius: var(--sl-radius-sm);
+    background-color: var(--sl-color-neutral-soft);
+    color: var(--sl-color-neutral-soft-fg);
+    font-size: var(--sl-text-xs);
+    line-height: 1.6;
+    white-space: nowrap;
+
+    > button {
+      display: inline-grid;
+      place-items: center;
+      /* 24px target (WCAG 2.5.8) drawn as a 16px glyph: pad, then pull the margins back in. */
+      inline-size: 1.5rem;
+      block-size: 1.5rem;
+      margin: -0.25rem;
+      margin-inline-start: -0.125rem;
+      border-radius: var(--sl-radius-sm);
+      color: inherit;
+      cursor: pointer;
+      &:hover { background-color: color-mix(in oklch, currentColor 15%, transparent); }
+      > svg { inline-size: 0.75rem; block-size: 0.75rem; }
+    }
+  }
+
+  /* Combobox: input plus adornments */
+  .sl-combobox-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    > .sl-input { padding-inline-end: var(--sl-space-10); }
+
+    /* Multiple: chips share the frame with the text input. */
+    &.sl-combobox-multi {
+      --_border: var(--sl-color-border-strong);
+      flex-wrap: wrap;
+      gap: var(--sl-space-1);
+      min-block-size: var(--sl-control-height-md);
+      padding: var(--sl-space-1) var(--sl-space-10) var(--sl-space-1) var(--sl-space-2);
+      border: 1px solid var(--_border);
+      border-radius: var(--sl-input-radius, var(--sl-control-radius));
+      background-color: var(--sl-color-surface);
+      box-shadow: var(--sl-input-shadow, none);
+      cursor: text;
+      transition: border-color var(--sl-duration-fast) var(--sl-ease);
+
+      &:hover { --_border: color-mix(in oklch, var(--sl-color-border-strong), var(--sl-color-fg) 20%); }
+      &:has(:focus-visible) { --_border: var(--sl-color-focus); outline: var(--sl-focus-ring); outline-offset: 0; }
+      &:has([aria-invalid="true"]) { --_border: var(--sl-color-danger); }
+
+      > .sl-input {
+        flex: 1;
+        min-inline-size: 6rem;
+        min-block-size: calc(var(--sl-control-height-md) - var(--sl-space-2) - 2px);
+        padding-inline: var(--sl-space-1) 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        &:focus-visible { outline: none; }
+      }
+      > .sl-combobox-adornments { inset-block-start: 50%; translate: 0 -50%; }
+    }
+
+    > .sl-combobox-adornments {
+      position: absolute;
+      inset-inline-end: var(--sl-space-2);
+      display: flex;
+      align-items: center;
+      gap: 0.125rem;
+      color: var(--sl-color-fg-muted);
+
+      > .sl-spinner { inline-size: 1rem; block-size: 1rem; }
+    }
+  }
+
+  .sl-combobox-clear,
+  .sl-combobox-toggle {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: var(--sl-radius-sm);
+    color: var(--sl-color-fg-muted);
+    cursor: pointer;
+    &:hover { color: var(--sl-color-fg); background-color: var(--sl-color-neutral-soft); }
+    > svg { inline-size: 1rem; block-size: 1rem; }
+    &[hidden] { display: none; }
+  }
+}

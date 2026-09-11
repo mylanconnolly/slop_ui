@@ -1,0 +1,131 @@
+/* Kitchen sink styles. Everything here is unlayered on purpose: it proves
+   that consumer CSS overrides the library without specificity tricks. */
+@import "../../../assets/css/slop_ui.css";
+@import "../../../assets/css/themes.css";
+
+.sink { --sl-sidebar-width: 14rem; }
+
+.sink-sidebar { background-color: var(--sl-color-surface-sunken); }
+
+.sink-header {
+  .sl-page-title { font-size: var(--sl-text-3xl); letter-spacing: -0.02em; }
+}
+
+.sink-example {
+  h2 { font-size: var(--sl-text-xl); font-weight: 600; margin-block-end: var(--sl-space-1); }
+}
+.sink-example-description { color: var(--sl-color-fg-muted); font-size: var(--sl-text-sm); margin-block-end: var(--sl-space-3); }
+
+.sink-demo {
+  margin-block-start: var(--sl-space-3);
+  padding: var(--sl-space-6);
+  border: 1px solid var(--sl-color-border);
+  border-radius: var(--sl-radius-lg);
+  background: var(--sl-color-surface);
+}
+
+.sink-code {
+  margin-block-start: var(--sl-space-2);
+  summary { cursor: pointer; font-size: var(--sl-text-sm); color: var(--sl-color-fg-muted); }
+  pre.lumis {
+    margin-block-start: var(--sl-space-2);
+    padding: var(--sl-space-4);
+    border: 1px solid var(--sl-color-border);
+    border-radius: var(--sl-radius-md);
+    font-size: var(--sl-text-xs);
+    line-height: 1.6;
+    overflow-x: auto;
+    tab-size: 2;
+  }
+  .l-line { min-block-size: 1lh; }
+}
+
+.sink-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: var(--sl-space-2); }
+.sink-swatch {
+  block-size: 3.5rem;
+  border-radius: var(--sl-radius-md);
+  border: 1px solid var(--sl-color-border);
+  display: grid;
+  align-content: end;
+  padding: var(--sl-space-2);
+  font-size: var(--sl-text-xs);
+  font-family: var(--sl-font-mono);
+}
+
+.sink-matrix { display: grid; gap: var(--sl-space-3); align-items: center; }
+.sink-matrix > span { font-size: var(--sl-text-xs); color: var(--sl-color-fg-subtle); font-family: var(--sl-font-mono); }
+
+
+
+/* ---- API reference ---- */
+.sink-reference {
+  margin-block-start: var(--sl-space-12);
+  padding-block-start: var(--sl-space-8);
+  border-block-start: 1px solid var(--sl-color-border);
+  > h2 { font-size: var(--sl-text-2xl); font-weight: 600; margin-block-end: var(--sl-space-6); }
+}
+.sink-ref {
+  margin-block-end: var(--sl-space-10);
+  h3 { font-size: var(--sl-text-lg); font-weight: 600; margin-block-end: var(--sl-space-2); display: flex; align-items: baseline; gap: var(--sl-space-3); flex-wrap: wrap; code { font-size: 1em; } }
+  h4 { font-size: var(--sl-text-sm); font-weight: 600; color: var(--sl-color-fg-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-block: var(--sl-space-5) var(--sl-space-2); }
+  .sl-table td:nth-child(1), .sl-table td:nth-child(2), .sl-table td:nth-child(3) { white-space: nowrap; vertical-align: top; }
+  .sl-table td:last-child { max-inline-size: 36rem; }
+  .sl-table code { font-size: var(--sl-text-xs); }
+}
+.sink-ref-module { font-size: var(--sl-text-xs); font-weight: 400; color: var(--sl-color-fg-subtle); font-family: var(--sl-font-mono); }
+.sink-ref-doc {
+  max-inline-size: 60rem;
+  color: var(--sl-color-fg-muted);
+  font-size: var(--sl-text-sm);
+  p, ul { margin-block-end: var(--sl-space-3); }
+  ul { padding-inline-start: 1.25rem; }
+  pre.lumis { margin-block: var(--sl-space-2) var(--sl-space-4); padding: var(--sl-space-3) var(--sl-space-4); border: 1px solid var(--sl-color-border); border-radius: var(--sl-radius-md); font-size: var(--sl-text-xs); line-height: 1.6; overflow-x: auto; }
+}
+.sink-required { color: var(--sl-color-danger-text); margin-inline-start: 2px; }
+.sink-values { display: flex; flex-wrap: wrap; gap: var(--sl-space-1); margin-block-start: var(--sl-space-1); }
+.sink-muted { color: var(--sl-color-fg-subtle); font-size: var(--sl-text-xs); }
+.sink-slot-attrs { margin: 0; padding-inline-start: 1rem; li { margin-block: 2px; } }
+
+/* ---- appearance controls & theme builder ---- */
+.sink-appearance { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sl-space-2); > .sl-native-select { inline-size: auto; min-block-size: var(--sl-control-height-sm); font-size: var(--sl-text-xs); } }
+.sink-builder { display: grid; grid-template-columns: 18rem 1fr; gap: var(--sl-space-8); align-items: start; }
+.sink-builder-controls { display: flex; flex-direction: column; gap: var(--sl-space-3); position: sticky; top: var(--sl-space-4); }
+.sink-builder-controls label { display: grid; grid-template-columns: 1fr auto; gap: var(--sl-space-1) var(--sl-space-2); font-size: var(--sl-text-sm); > input[type=range], > select { grid-column: 1 / -1; } > output { color: var(--sl-color-fg-muted); font-variant-numeric: tabular-nums; } }
+.sink-builder-preview { padding: var(--sl-space-6); border: 1px solid var(--sl-color-border); border-radius: var(--sl-radius-lg); background: var(--sl-color-bg); color: var(--sl-color-fg); }
+.sink-builder-output { margin-block-start: var(--sl-space-4); padding: var(--sl-space-4); border-radius: var(--sl-radius-md); background: var(--sl-color-surface-sunken); font-family: var(--sl-font-mono); font-size: var(--sl-text-xs); white-space: pre; overflow-x: auto; }
+.sink-swatch-pair { display: inline-flex; > i { inline-size: 1.25rem; block-size: 1.25rem; border: 1px solid var(--sl-color-border); } > i:first-child { border-radius: 4px 0 0 4px; } > i:last-child { border-radius: 0 4px 4px 0; margin-inline-start: -1px; } }
+.sink-hue-track { block-size: 0.5rem; border-radius: 999px; background: linear-gradient(to right in oklch longer hue, oklch(70% 0.15 0), oklch(70% 0.15 360)); }
+@media (width < 60rem) { .sink-builder { grid-template-columns: 1fr; } .sink-builder-controls { position: static; } }
+
+/* Icons page */
+.sink-icon-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: var(--sl-space-2);
+}
+.sink-icon-grid li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sl-space-2);
+  padding: var(--sl-space-3);
+  border: 1px solid var(--sl-color-border);
+  border-radius: var(--sl-radius-md);
+  text-align: center;
+}
+.sink-icon-grid .sl-icon { font-size: 1.5rem; }
+.sink-icon-grid code { font-size: 0.7rem; color: var(--sl-color-fg-muted); overflow-wrap: anywhere; }
+
+/* Appearance is a compact secondary action outside the Themes workspace. */
+.sink-appearance-menu .sink-appearance {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  > .sl-native-select { inline-size: 100%; }
+  > .sl-theme-toggle { justify-self: start; }
+}
+
+/* Keep comparison matrices inside the demo and leave room for focus outlines. */
+.sink-matrix-scroll { max-inline-size: 100%; padding: 0.25rem; }

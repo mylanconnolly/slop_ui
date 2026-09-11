@@ -1,0 +1,60 @@
+/*
+ * Layout primitives. These are the escape valve that keeps people from
+ * reaching for utility classes: they compose, they are semantic, and they
+ * take a `data-gap` instead of twenty spacing classes.
+ */
+@layer sl.layout {
+  .sl-stack,
+  .sl-cluster,
+  .sl-grid {
+    --_gap: var(--sl-space-4);
+    gap: var(--_gap);
+
+    &[data-gap="none"] { --_gap: 0; }
+    &[data-gap="xs"]   { --_gap: var(--sl-space-1); }
+    &[data-gap="sm"]   { --_gap: var(--sl-space-2); }
+    &[data-gap="md"]   { --_gap: var(--sl-space-4); }
+    &[data-gap="lg"]   { --_gap: var(--sl-space-6); }
+    &[data-gap="xl"]   { --_gap: var(--sl-space-8); }
+  }
+
+  /* Vertical rhythm. */
+  .sl-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    &[data-align="start"]  { align-items: flex-start; }
+    &[data-align="center"] { align-items: center; }
+    &[data-align="end"]    { align-items: flex-end; }
+  }
+
+  /* Horizontal grouping that wraps. */
+  .sl-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    &[data-justify="start"]   { justify-content: flex-start; }
+    &[data-justify="center"]  { justify-content: center; }
+    &[data-justify="end"]     { justify-content: flex-end; }
+    &[data-justify="between"] { justify-content: space-between; }
+    &[data-align="start"]     { align-items: flex-start; }
+    &[data-align="end"]       { align-items: flex-end; }
+    &[data-align="baseline"]  { align-items: baseline; }
+    &[data-nowrap]            { flex-wrap: nowrap; }
+  }
+
+  /* Responsive auto-fit grid: `--sl-grid-min` sets the minimum column width. */
+  .sl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(var(--sl-grid-min, 16rem), 100%), 1fr));
+  }
+
+  .sl-container {
+    inline-size: 100%;
+    max-inline-size: var(--sl-container-max, 72rem);
+    margin-inline: auto;
+    padding-inline: var(--sl-space-4);
+  }
+}

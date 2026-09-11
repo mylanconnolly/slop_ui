@@ -1,0 +1,65 @@
+/*
+ * Accessibility overrides. Last layer so they win over component rules while
+ * still losing to the consumer's unlayered CSS.
+ */
+@layer sl.overrides {
+  /* Component display values must never defeat the hidden attribute. */
+  [hidden]:not([hidden="until-found"]) {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after,
+    ::backdrop {
+      animation-duration: 0.01ms;
+      animation-iteration-count: 1;
+      transition-duration: 0.01ms;
+      scroll-behavior: auto;
+    }
+  }
+
+  @media (forced-colors: active) {
+    /* Make sure interactive boundaries survive when backgrounds are stripped. */
+    .sl-button,
+    .sl-badge,
+    .sl-input,
+    .sl-textarea,
+    .sl-native-select,
+    .sl-select-trigger,
+    .sl-card,
+    .sl-menu-list,
+    .sl-dialog,
+    .sl-alert,
+    .sl-popover-panel,
+    .sl-listbox,
+    .sl-calendar,
+    .sl-dropzone,
+    .sl-tag-input,
+    .sl-chip,
+    .sl-toast,
+    .sl-toggle-group > label,
+    .sl-pin > input,
+    .sl-select-trigger {
+      border: 1px solid CanvasText;
+    }
+
+    /* Selected/pressed states must not depend on a background fill. */
+    .sl-tab[aria-selected="true"],
+    .sl-option[aria-selected="true"],
+    .sl-calendar-day[aria-selected="true"],
+    .sl-toggle-group > label:has(:checked),
+    .sl-button[aria-pressed="true"] {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+    }
+
+    .sl-button[data-variant="solid"] {
+      forced-color-adjust: none;
+      background: ButtonText;
+      color: ButtonFace;
+    }
+  }
+}

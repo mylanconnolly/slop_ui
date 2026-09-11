@@ -1,0 +1,58 @@
+/*
+ * SlopUI — semantic, themeable, accessible components for Phoenix LiveView.
+ *
+ * Everything lives inside the `sl` cascade layer. Any unlayered rule in your
+ * own stylesheet beats these, so overrides never need `!important` or
+ * specificity games. If you use layers yourself, declare the order once:
+ *
+ *   @layer sl, app;
+ *
+ * Sub-layer order (earlier loses to later):
+ *   reset       - minimal modern reset
+ *   tokens      - design tokens (custom properties) and theme switching
+ *   base        - element defaults, focus rings, typography
+ *   layout      - composition primitives (stack, cluster, grid)
+ *   components  - the component styles
+ *   overrides   - accessibility overrides (reduced motion, forced colors)
+ */
+@layer sl.reset, sl.tokens, sl.base, sl.layout, sl.components, sl.overrides;
+
+@import "./reset.css";
+@import "./tokens.css";
+@import "./base.css";
+@import "./layout.css";
+
+@import "./components/button.css";
+@import "./components/badge.css";
+@import "./components/avatar.css";
+@import "./components/card.css";
+@import "./components/form.css";
+@import "./components/alert.css";
+@import "./components/dialog.css";
+@import "./components/menu.css";
+@import "./components/tree.css";
+@import "./components/hover_card.css";
+@import "./components/tooltip.css";
+@import "./components/theme_toggle.css";
+@import "./components/tabs.css";
+@import "./components/accordion.css";
+@import "./components/toast.css";
+@import "./components/table.css";
+@import "./components/elements.css";
+@import "./components/select.css";
+@import "./components/popover.css";
+@import "./components/choices.css";
+@import "./components/inputs.css";
+@import "./components/structure.css";
+@import "./components/upload.css";
+@import "./components/command.css";
+@import "./components/date_picker.css";
+@import "./components/extras.css";
+@import "./components/prose.css";
+@import "./components/shell.css";
+@import "./components/markdown_editor.css";
+@import "./components/split_panel.css";
+@import "./components/scroll_area.css";
+@import "./components/carousel.css";
+
+@import "./overrides.css";

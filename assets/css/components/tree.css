@@ -1,0 +1,144 @@
+/*
+ * Tree view (WAI-ARIA tree). Rows are the treeitems; each branch row is
+ * followed by a .sl-tree-children wrapper whose group animates open and
+ * closed with the grid 0fr→1fr trick. Nested groups indent themselves.
+ */
+@layer sl.components {
+  .sl-tree,
+  .sl-tree-group {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sl-tree {
+    --_indent: var(--sl-space-5);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-fg);
+  }
+
+  .sl-tree-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    position: relative;
+    padding-inline-start: var(--_indent);
+    min-block-size: 0;
+
+    /* Guide line under the parent's toggle */
+    &::before {
+      content: "";
+      position: absolute;
+      inset-block: var(--sl-space-1);
+      inset-inline-start: calc(var(--_indent) / 2 - 1px);
+      inline-size: 1px;
+      background-color: var(--sl-color-border);
+    }
+  }
+
+  .sl-tree-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .sl-tree-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sl-space-2);
+    min-block-size: var(--sl-control-height-sm);
+    padding-inline: var(--sl-space-1) var(--sl-space-2);
+    border-radius: var(--sl-radius-sm);
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover { background-color: var(--sl-color-neutral-soft); }
+
+    &:focus-visible {
+      outline: var(--sl-focus-ring);
+      outline-offset: -2px;
+    }
+
+    &[aria-selected="true"] {
+      background-color: var(--sl-color-accent-soft);
+      color: var(--sl-color-accent-soft-fg);
+      font-weight: var(--sl-weight-medium);
+      > svg { color: inherit; }
+    }
+
+    &[aria-disabled="true"] {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background-color: transparent;
+    }
+
+    > svg {
+      inline-size: 1rem;
+      block-size: 1rem;
+      flex: none;
+      color: var(--sl-color-fg-muted);
+    }
+  }
+
+  .sl-tree-label {
+    flex: 1;
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sl-tree-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    border-radius: var(--sl-radius-sm);
+    color: var(--sl-color-fg-muted);
+
+    > svg {
+      inline-size: 0.875rem;
+      block-size: 0.875rem;
+      transition: rotate var(--sl-duration) var(--sl-ease);
+    }
+    &[data-leaf] { visibility: hidden; }
+  }
+
+  .sl-tree-row[aria-expanded="true"] > .sl-tree-toggle > svg { rotate: 90deg; }
+
+  /* Expand/collapse animation. Collapsed groups are visibility:hidden so
+     their rows leave the tab order and the accessibility tree. */
+  .sl-tree-children {
+    display: grid;
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition:
+      grid-template-rows var(--sl-duration-slow) var(--sl-ease),
+      visibility 0s;
+
+    > .sl-tree-group { overflow: hidden; }
+  }
+
+  .sl-tree-row[aria-expanded="false"] + .sl-tree-children {
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition:
+      grid-template-rows var(--sl-duration-slow) var(--sl-ease),
+      visibility 0s linear var(--sl-duration-slow);
+  }
+
+  @media (forced-colors: active) {
+    .sl-tree-row[aria-selected="true"] {
+      background-color: Highlight;
+      color: HighlightText;
+      forced-color-adjust: none;
+    }
+  }
+}

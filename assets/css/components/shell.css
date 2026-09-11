@@ -1,0 +1,240 @@
+/*
+ * App shell: sidebar + topbar + content, with the sidebar becoming a sheet
+ * below the breakpoint. Auth layout: a centred card on the page ground.
+ */
+@layer sl.components {
+  .sl-app-shell {
+    position: relative;
+    --_sidebar: var(--sl-sidebar-width, 16rem);
+    --_topbar: var(--sl-topbar-height, 3.5rem);
+
+    display: grid;
+    grid-template-columns: var(--_sidebar) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "sidebar topbar" "sidebar main";
+    min-block-size: 100dvh;
+    background-color: var(--sl-color-bg);
+
+    &[data-sidebar="none"] { grid-template-columns: minmax(0, 1fr); grid-template-areas: "topbar" "main"; }
+  }
+
+  .sl-sidebar {
+    grid-area: sidebar;
+    position: sticky;
+    inset-block-start: 0;
+    block-size: 100dvh;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sl-space-4);
+    padding: var(--sl-space-4);
+    border-inline-end: 1px solid var(--sl-color-border);
+    background-color: var(--sl-color-surface);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    &[data-theme] { background-color: var(--sl-color-bg); }
+  }
+  .sl-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--sl-space-2);
+    min-block-size: var(--sl-control-height-md);
+    padding-inline: var(--sl-space-2);
+    color: var(--sl-color-fg);
+    font-weight: var(--sl-weight-semibold);
+    text-decoration: none;
+    > svg, > img { inline-size: 1.5rem; block-size: 1.5rem; }
+  }
+  .sl-sidebar-body { flex: 1; display: flex; flex-direction: column; gap: var(--sl-space-4); min-block-size: 0; }
+  .sl-sidebar-footer { margin-block-start: auto; padding-block-start: var(--sl-space-3); border-block-start: 1px solid var(--sl-color-border); }
+
+  .sl-topbar {
+    grid-area: topbar;
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: var(--sl-space-3);
+    min-block-size: var(--_topbar);
+    padding-inline: var(--sl-space-4);
+    border-block-end: 1px solid var(--sl-color-border);
+    background-color: color-mix(in oklch, var(--sl-color-bg) 85%, transparent);
+    backdrop-filter: blur(8px);
+  }
+  .sl-topbar-start, .sl-topbar-end { display: flex; align-items: center; gap: var(--sl-space-2); min-inline-size: 0; }
+  .sl-topbar-end { margin-inline-start: auto; }
+  .sl-topbar-toggle { display: none; }
+
+  /* Skip link: visually hidden until focused, then pinned over the topbar. */
+  .sl-skip-link {
+    position: absolute;
+    inset-block-start: var(--sl-space-2);
+    inset-inline-start: var(--sl-space-2);
+    z-index: 100;
+    padding: var(--sl-space-2) var(--sl-space-3);
+    border-radius: var(--sl-radius-md);
+    background-color: var(--sl-color-accent);
+    color: var(--sl-color-accent-fg);
+    font-weight: var(--sl-weight-medium);
+    text-decoration: none;
+    translate: 0 calc(-100% - var(--sl-space-4));
+    opacity: 0;
+    transition: translate var(--sl-duration-fast) var(--sl-ease), opacity var(--sl-duration-fast) var(--sl-ease);
+
+    &:focus-visible {
+      translate: 0 0;
+      opacity: 1;
+      outline-offset: 2px;
+    }
+  }
+  .sl-app-main:focus { outline: none; }
+
+  .sl-app-main {
+    grid-area: main;
+    min-inline-size: 0;
+    padding: var(--sl-space-8) var(--sl-space-6);
+    &[data-width="narrow"] > * { max-inline-size: 48rem; margin-inline: auto; }
+    &[data-width="wide"] > * { max-inline-size: 90rem; margin-inline: auto; }
+  }
+
+  /* ---- Navigation ---- */
+  .sl-nav { display: flex; flex-direction: column; gap: var(--sl-space-4); }
+  .sl-nav-group { display: flex; flex-direction: column; gap: 2px; }
+  .sl-nav-group-label {
+    padding: 0 var(--sl-space-2) var(--sl-space-1);
+    color: var(--sl-color-fg-subtle);
+    font-size: var(--sl-text-xs);
+    font-weight: var(--sl-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .sl-nav-list { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; }
+
+  .sl-nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--sl-space-2);
+    min-block-size: var(--sl-control-height-sm);
+    padding-inline: var(--sl-space-2);
+    border-radius: var(--sl-radius-md);
+    color: var(--sl-color-fg-muted);
+    font-size: var(--sl-text-sm);
+    font-weight: var(--sl-weight-medium);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--sl-duration-fast) var(--sl-ease), color var(--sl-duration-fast) var(--sl-ease);
+
+    > svg { flex: none; inline-size: 1.125rem; block-size: 1.125rem; }
+    > .sl-nav-item-label { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    > .sl-badge { margin-inline-start: auto; }
+
+    &:hover { background-color: var(--sl-color-neutral-soft); color: var(--sl-color-fg); }
+    &[aria-current="page"], &[aria-current="true"] {
+      background-color: var(--sl-color-accent-soft);
+      color: var(--sl-color-accent-soft-fg);
+      > svg { color: var(--sl-color-accent-text); }
+    }
+    &:focus-visible { outline-offset: -2px; }
+  }
+
+  /* Collapsible nav group: a <details> whose summary is a nav item. */
+  .sl-nav-collapsible {
+    > summary { list-style: none; &::-webkit-details-marker { display: none; } }
+    > summary > .sl-nav-item > .sl-nav-caret { margin-inline-start: auto; inline-size: 1rem; block-size: 1rem; color: var(--sl-color-fg-subtle); transition: rotate var(--sl-duration-fast) var(--sl-ease); }
+    &[open] > summary > .sl-nav-item > .sl-nav-caret { rotate: 180deg; }
+    > .sl-nav-list { padding-inline-start: calc(var(--sl-space-2) + 1.125rem + var(--sl-space-2)); margin-block-start: 2px; }
+  }
+
+  /* ---- Indicator (dot or count on an icon button) ---- */
+  .sl-indicator {
+    position: relative;
+    display: inline-flex;
+    > .sl-indicator-mark {
+      /* Sits over the host's corner, no halo: a ring would cut the host's border. */
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-end: 0;
+      translate: 35% -35%;
+      min-inline-size: 0.5rem;
+      block-size: 0.5rem;
+      padding-inline: 0;
+      border-radius: var(--sl-radius-full);
+      background-color: var(--sl-color-danger);
+      color: var(--sl-color-danger-fg);
+      font-size: 0.625rem;
+      font-weight: var(--sl-weight-semibold);
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      &:not(:empty) { min-inline-size: 1rem; block-size: 1rem; padding-inline: 0.25rem; }
+    }
+    &[data-color="accent"] > .sl-indicator-mark { background-color: var(--sl-color-accent); color: var(--sl-color-accent-fg); }
+    &[data-color="success"] > .sl-indicator-mark { background-color: var(--sl-color-success); color: var(--sl-color-success-fg); }
+  }
+
+  /* ---- Auth layout ---- */
+  .sl-auth {
+    min-block-size: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: var(--sl-space-6);
+    background-color: var(--sl-color-bg);
+  }
+  .sl-auth-panel { inline-size: min(100%, var(--sl-auth-width, 26rem)); display: flex; flex-direction: column; gap: var(--sl-space-6); }
+  .sl-auth-brand { display: flex; justify-content: center; align-items: center; gap: var(--sl-space-2); font-weight: var(--sl-weight-semibold); > svg, > img { inline-size: 2rem; block-size: 2rem; } }
+  .sl-auth-heading { text-align: center; }
+  .sl-auth-title { font-size: var(--sl-text-2xl); font-weight: var(--sl-weight-semibold); letter-spacing: -0.01em; }
+  .sl-auth-description { margin-block-start: var(--sl-space-1); color: var(--sl-color-fg-muted); }
+  .sl-auth-footer { text-align: center; color: var(--sl-color-fg-muted); font-size: var(--sl-text-sm); }
+
+  /* ---- Mobile: sidebar becomes a sheet ---- */
+  @media (width < 64rem) {
+    .sl-app-shell { grid-template-columns: minmax(0, 1fr); grid-template-areas: "topbar" "main"; }
+    .sl-sidebar:not(.sl-sheet .sl-sidebar) { display: none; }
+    .sl-topbar-toggle { display: inline-flex; }
+    .sl-app-main { padding: var(--sl-space-5) var(--sl-space-4); }
+    .sl-sheet .sl-sidebar { position: static; block-size: auto; min-block-size: 100%; border: 0; }
+  }
+  @media (width >= 64rem) {
+    .sl-sidebar-sheet { display: none; }
+  }
+}
+
+/* The modal owns the viewport so its external close button remains focusable.
+   Only the navigation surface slides; the close control stays in the corner. */
+@layer sl.components {
+  .sl-sheet.sl-sidebar-sheet[data-side="left"] {
+    inline-size: 100%;
+    background: transparent;
+    box-shadow: none;
+    translate: none;
+    will-change: auto;
+    transition: display var(--sl-duration-slow) allow-discrete,
+                overlay var(--sl-duration-slow) allow-discrete;
+
+    > .sl-sidebar {
+      inline-size: min(18rem, calc(100% - 4.5rem));
+      block-size: 100%;
+      min-block-size: 0;
+      box-shadow: var(--sl-shadow-lg);
+      translate: -100% 0;
+      transition: translate var(--sl-duration-slow) var(--sl-ease);
+    }
+    &[open] > .sl-sidebar {
+      translate: 0 0;
+      @starting-style { translate: -100% 0; }
+    }
+  }
+
+  .sl-sidebar-close {
+    position: absolute;
+    inset-block-start: max(var(--sl-space-3), env(safe-area-inset-top));
+    inset-inline-end: max(var(--sl-space-3), env(safe-area-inset-right));
+    margin: 0;
+    > .sl-button {
+      background-color: var(--sl-color-surface-raised);
+      box-shadow: var(--sl-shadow-sm);
+    }
+  }
+}

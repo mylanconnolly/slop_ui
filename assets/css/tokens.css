@@ -1,0 +1,282 @@
+/*
+ * Design tokens.
+ *
+ * Theming model (three tiers):
+ *   1. Global tokens   (--sl-*)              set here, override to re-theme everything
+ *   2. Component tokens (--sl-button-*, ...)  set per component, override to restyle one component
+ *   3. Component rules                        read only tokens, never raw values
+ *
+ * Colors are OKLCH. Every semantic color is expressed with light-dark(), which
+ * follows the element's `color-scheme`. That gives us three theme modes for free:
+ *   - no data-theme attribute    -> follows prefers-color-scheme
+ *   - [data-theme="light"|"dark"] -> forced, on :root or on any subtree
+ */
+@layer sl.tokens {
+  :root {
+    color-scheme: light dark;
+
+    /* ------------------------------------------------------------------ */
+    /* Hues. Change --sl-hue-accent to rebrand.                            */
+    /* ------------------------------------------------------------------ */
+    /*
+     * Warm by default: neutrals sit at a stone hue (70) with a touch more
+     * chroma than a cool grey would carry, paired with a purple accent so
+     * the brand colour never competes with danger (red) or warning (amber).
+     */
+    --sl-hue-neutral: 70;
+    --sl-hue-accent: 305;
+    --sl-hue-success: 145;
+    --sl-hue-warning: 85;
+    --sl-hue-danger: 20;
+    --sl-hue-info: 240;
+
+    /* Chroma applied to neutrals. 0 = pure grey. */
+    --sl-neutral-chroma: 0.016;
+    /* Chroma for the accent family. */
+    --sl-accent-chroma: 0.18;
+
+    /* ------------------------------------------------------------------ */
+    /* Surfaces & text                                                     */
+    /* ------------------------------------------------------------------ */
+    /* Dark-scheme surface lightness, overridable (see [data-dark="black"]). */
+    --sl-dark-bg-l: 14.5%;
+    --sl-dark-surface-l: 18%;
+    --sl-dark-raised-l: 22%;
+    --sl-dark-sunken-l: 12%;
+
+    /* ------------------------------------------------------------------ */
+    /* Typography                                                          */
+    /* ------------------------------------------------------------------ */
+    --sl-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", sans-serif;
+    --sl-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --sl-text-xs: 0.75rem;
+    --sl-text-sm: 0.875rem;
+    --sl-text-md: 1rem;
+    --sl-text-lg: 1.125rem;
+    --sl-text-xl: 1.25rem;
+    --sl-text-2xl: 1.5rem;
+    --sl-text-3xl: 1.875rem;
+    --sl-leading-tight: 1.25;
+    --sl-leading: 1.5;
+    --sl-weight-normal: 400;
+    --sl-weight-medium: 500;
+    --sl-weight-semibold: 600;
+
+    /* ------------------------------------------------------------------ */
+    /* Space, radius, shadow                                               */
+    /* ------------------------------------------------------------------ */
+    /* Density scales every spacing token and control height; radius scale scales every corner. */
+    --sl-density: 1;
+    --sl-radius-scale: 1;
+
+
+    /* ------------------------------------------------------------------ */
+    /* Motion                                                              */
+    /* ------------------------------------------------------------------ */
+    --sl-duration-fast: 120ms;
+    --sl-duration: 200ms;
+    --sl-duration-slow: 320ms;
+    --sl-ease: cubic-bezier(0.2, 0, 0, 1);
+    --sl-ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --sl-ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --sl-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+
+
+  /*
+   * Derived tokens. Custom properties resolve var() where they are declared,
+   * so these are declared on every element that can change an input
+   * (a palette, theme, density, radius, contrast or dark variant), not only
+   * on :root. That is what lets a subtree carry its own palette or density.
+   * To re-theme a subtree with custom hues, give it data-palette="custom"
+   * (any name) and override the hue variables there.
+   */
+  :where(:root, [data-palette], [data-theme], [data-density], [data-radius], [data-contrast], [data-dark]) {
+    --sl-color-bg:             light-dark(oklch(98.2% calc(var(--sl-neutral-chroma) * 0.6) var(--sl-hue-neutral)), oklch(var(--sl-dark-bg-l) calc(var(--sl-neutral-chroma) * 0.8) var(--sl-hue-neutral)));
+    --sl-color-surface:        light-dark(oklch(100% 0 0),                                                          oklch(var(--sl-dark-surface-l) var(--sl-neutral-chroma) var(--sl-hue-neutral)));
+    --sl-color-surface-raised: light-dark(oklch(100% 0 0),                                                          oklch(var(--sl-dark-raised-l) var(--sl-neutral-chroma) var(--sl-hue-neutral)));
+    --sl-color-surface-sunken: light-dark(oklch(96.5% calc(var(--sl-neutral-chroma) * 0.5) var(--sl-hue-neutral)), oklch(var(--sl-dark-sunken-l) var(--sl-neutral-chroma) var(--sl-hue-neutral)));
+    --sl-color-fg:             light-dark(oklch(18% var(--sl-neutral-chroma) var(--sl-hue-neutral)),                 oklch(95% calc(var(--sl-neutral-chroma) * 0.5) var(--sl-hue-neutral)));
+    /* Secondary text and border lightness, overridable (see [data-contrast="more"]). */
+    --sl-muted-l: 45%;        --sl-muted-l-dark: 72%;
+    --sl-subtle-l: 52%;       --sl-subtle-l-dark: 65%;
+    --sl-border-l: 90%;       --sl-border-l-dark: 28%;
+    --sl-border-strong-l: 66%; --sl-border-strong-l-dark: 50%;
+
+    --sl-color-fg-muted:       light-dark(oklch(var(--sl-muted-l) var(--sl-neutral-chroma) var(--sl-hue-neutral)),  oklch(var(--sl-muted-l-dark) var(--sl-neutral-chroma) var(--sl-hue-neutral)));
+    --sl-color-fg-subtle:      light-dark(oklch(var(--sl-subtle-l) var(--sl-neutral-chroma) var(--sl-hue-neutral)), oklch(var(--sl-subtle-l-dark) var(--sl-neutral-chroma) var(--sl-hue-neutral)));
+    --sl-color-border:         light-dark(oklch(var(--sl-border-l) var(--sl-neutral-chroma) var(--sl-hue-neutral)), oklch(var(--sl-border-l-dark) var(--sl-neutral-chroma) var(--sl-hue-neutral)));
+    /* border-strong outlines controls (inputs, outline buttons): 3:1 against the surface per WCAG 1.4.11. */
+    --sl-color-border-strong:  light-dark(oklch(var(--sl-border-strong-l) var(--sl-neutral-chroma) var(--sl-hue-neutral)), oklch(var(--sl-border-strong-l-dark) var(--sl-neutral-chroma) var(--sl-hue-neutral)));
+
+    /* Neutral "solid" (used for the default button): inverted surface */
+    --sl-color-neutral:          var(--sl-color-fg);
+    --sl-color-neutral-hover:    light-dark(oklch(from var(--sl-color-fg) calc(l + 0.12) c h), oklch(from var(--sl-color-fg) calc(l - 0.10) c h));
+    --sl-color-neutral-active:   light-dark(oklch(from var(--sl-color-fg) calc(l + 0.18) c h), oklch(from var(--sl-color-fg) calc(l - 0.16) c h));
+    --sl-color-neutral-fg:       var(--sl-color-bg);
+    --sl-color-neutral-soft:     light-dark(oklch(94% var(--sl-neutral-chroma) var(--sl-hue-neutral)), oklch(26% var(--sl-neutral-chroma) var(--sl-hue-neutral)));
+    --sl-color-neutral-soft-hover: light-dark(oklch(90% var(--sl-neutral-chroma) var(--sl-hue-neutral)), oklch(31% var(--sl-neutral-chroma) var(--sl-hue-neutral)));
+    --sl-color-neutral-soft-fg:  var(--sl-color-fg);
+    --sl-color-neutral-text:     var(--sl-color-fg);
+
+    /* ------------------------------------------------------------------ */
+    /* Semantic color families. Each family has:                          */
+    /*   -{name}          solid fill                                       */
+    /*   -{name}-hover    solid fill, hovered                              */
+    /*   -{name}-active   solid fill, pressed                              */
+    /*   -{name}-fg       text on the solid fill                           */
+    /*   -{name}-soft     tinted fill                                      */
+    /*   -{name}-soft-hover                                                */
+    /*   -{name}-soft-fg  text on the tinted fill                          */
+    /*   -{name}-text     the color used as text on a plain surface        */
+    /* Lightness values are chosen so -fg on solid and -soft-fg on -soft   */
+    /* meet WCAG AA (4.5:1) in both schemes.                               */
+    /* ------------------------------------------------------------------ */
+    --sl-color-accent:            oklch(52% var(--sl-accent-chroma) var(--sl-hue-accent));
+    --sl-color-accent-hover:      light-dark(oklch(from var(--sl-color-accent) calc(l - 0.06) c h), oklch(from var(--sl-color-accent) calc(l + 0.06) c h));
+    --sl-color-accent-active:     light-dark(oklch(from var(--sl-color-accent) calc(l - 0.10) c h), oklch(from var(--sl-color-accent) calc(l + 0.10) c h));
+    --sl-color-accent-fg:         oklch(100% 0 0);
+    --sl-color-accent-soft:       light-dark(oklch(95% 0.035 var(--sl-hue-accent)), oklch(26% 0.06 var(--sl-hue-accent)));
+    --sl-color-accent-soft-hover: light-dark(oklch(92% 0.05 var(--sl-hue-accent)),  oklch(31% 0.08 var(--sl-hue-accent)));
+    --sl-color-accent-soft-fg:    light-dark(oklch(38% 0.15 var(--sl-hue-accent)),  oklch(88% 0.08 var(--sl-hue-accent)));
+    --sl-color-accent-text:       light-dark(oklch(48% 0.19 var(--sl-hue-accent)),  oklch(78% 0.13 var(--sl-hue-accent)));
+
+    --sl-color-success:            oklch(50% 0.14 var(--sl-hue-success));
+    --sl-color-success-hover:      light-dark(oklch(from var(--sl-color-success) calc(l - 0.06) c h), oklch(from var(--sl-color-success) calc(l + 0.06) c h));
+    --sl-color-success-active:     light-dark(oklch(from var(--sl-color-success) calc(l - 0.10) c h), oklch(from var(--sl-color-success) calc(l + 0.10) c h));
+    --sl-color-success-fg:         oklch(100% 0 0);
+    --sl-color-success-soft:       light-dark(oklch(95% 0.05 var(--sl-hue-success)), oklch(25% 0.06 var(--sl-hue-success)));
+    --sl-color-success-soft-hover: light-dark(oklch(92% 0.07 var(--sl-hue-success)), oklch(30% 0.08 var(--sl-hue-success)));
+    --sl-color-success-soft-fg:    light-dark(oklch(36% 0.12 var(--sl-hue-success)), oklch(88% 0.10 var(--sl-hue-success)));
+    --sl-color-success-text:       light-dark(oklch(45% 0.14 var(--sl-hue-success)), oklch(78% 0.15 var(--sl-hue-success)));
+
+    /* Warning solid is dark enough (3:1 vs. light surfaces) while keeping dark text at 4.5:1. */
+    --sl-color-warning:            light-dark(oklch(65% 0.15 var(--sl-hue-warning)), oklch(80% 0.15 var(--sl-hue-warning)));
+    --sl-color-warning-hover:      light-dark(oklch(from var(--sl-color-warning) calc(l - 0.06) c h), oklch(from var(--sl-color-warning) calc(l + 0.06) c h));
+    --sl-color-warning-active:     light-dark(oklch(from var(--sl-color-warning) calc(l - 0.10) c h), oklch(from var(--sl-color-warning) calc(l + 0.10) c h));
+    --sl-color-warning-fg:         oklch(22% 0.05 var(--sl-hue-warning));
+    --sl-color-warning-soft:       light-dark(oklch(95% 0.06 var(--sl-hue-warning)), oklch(26% 0.06 var(--sl-hue-warning)));
+    --sl-color-warning-soft-hover: light-dark(oklch(92% 0.09 var(--sl-hue-warning)), oklch(31% 0.08 var(--sl-hue-warning)));
+    --sl-color-warning-soft-fg:    light-dark(oklch(36% 0.10 var(--sl-hue-warning)), oklch(90% 0.12 var(--sl-hue-warning)));
+    --sl-color-warning-text:       light-dark(oklch(45% 0.12 var(--sl-hue-warning)), oklch(82% 0.15 var(--sl-hue-warning)));
+
+    /* Danger sits well below warning in lightness so the two stay apart under red-green CVD. */
+    --sl-color-danger:            light-dark(oklch(42% 0.19 var(--sl-hue-danger)), oklch(52% 0.19 var(--sl-hue-danger)));
+    --sl-color-danger-hover:      light-dark(oklch(from var(--sl-color-danger) calc(l - 0.06) c h), oklch(from var(--sl-color-danger) calc(l + 0.06) c h));
+    --sl-color-danger-active:     light-dark(oklch(from var(--sl-color-danger) calc(l - 0.10) c h), oklch(from var(--sl-color-danger) calc(l + 0.10) c h));
+    --sl-color-danger-fg:         oklch(100% 0 0);
+    --sl-color-danger-soft:       light-dark(oklch(95% 0.03 var(--sl-hue-danger)), oklch(25% 0.07 var(--sl-hue-danger)));
+    --sl-color-danger-soft-hover: light-dark(oklch(92% 0.05 var(--sl-hue-danger)), oklch(30% 0.09 var(--sl-hue-danger)));
+    --sl-color-danger-soft-fg:    light-dark(oklch(40% 0.17 var(--sl-hue-danger)), oklch(88% 0.08 var(--sl-hue-danger)));
+    --sl-color-danger-text:       light-dark(oklch(50% 0.20 var(--sl-hue-danger)), oklch(78% 0.14 var(--sl-hue-danger)));
+
+    --sl-color-info:            oklch(52% 0.17 var(--sl-hue-info));
+    --sl-color-info-hover:      light-dark(oklch(from var(--sl-color-info) calc(l - 0.06) c h), oklch(from var(--sl-color-info) calc(l + 0.06) c h));
+    --sl-color-info-active:     light-dark(oklch(from var(--sl-color-info) calc(l - 0.10) c h), oklch(from var(--sl-color-info) calc(l + 0.10) c h));
+    --sl-color-info-fg:         oklch(100% 0 0);
+    --sl-color-info-soft:       light-dark(oklch(95% 0.03 var(--sl-hue-info)), oklch(25% 0.06 var(--sl-hue-info)));
+    --sl-color-info-soft-hover: light-dark(oklch(92% 0.05 var(--sl-hue-info)), oklch(30% 0.08 var(--sl-hue-info)));
+    --sl-color-info-soft-fg:    light-dark(oklch(38% 0.15 var(--sl-hue-info)), oklch(88% 0.08 var(--sl-hue-info)));
+    --sl-color-info-text:       light-dark(oklch(48% 0.17 var(--sl-hue-info)), oklch(78% 0.13 var(--sl-hue-info)));
+
+
+    /* Focus ring. Uses outline (not box-shadow) so it survives forced-colors. */
+    --sl-color-focus: var(--sl-color-accent);
+    --sl-focus-ring: 2px solid var(--sl-color-focus);
+    --sl-focus-offset: 2px;
+
+    /* Backdrops & overlays */
+    --sl-color-backdrop: light-dark(oklch(20% 0.02 var(--sl-hue-neutral) / 0.45), oklch(5% 0.01 var(--sl-hue-neutral) / 0.65));
+
+
+    --sl-space-1: calc(0.25rem * var(--sl-density));
+    --sl-space-2: calc(0.5rem * var(--sl-density));
+    --sl-space-3: calc(0.75rem * var(--sl-density));
+    --sl-space-4: calc(1rem * var(--sl-density));
+    --sl-space-5: calc(1.25rem * var(--sl-density));
+    --sl-space-6: calc(1.5rem * var(--sl-density));
+    --sl-space-8: calc(2rem * var(--sl-density));
+    --sl-space-10: calc(2.5rem * var(--sl-density));
+    --sl-space-12: calc(3rem * var(--sl-density));
+
+    --sl-control-radius: calc(0.375rem * var(--sl-radius-scale));
+    --sl-radius-sm: calc(0.25rem * var(--sl-radius-scale));
+    --sl-radius-md: calc(0.5rem * var(--sl-radius-scale));
+    --sl-radius-lg: calc(0.75rem * var(--sl-radius-scale));
+    --sl-radius-xl: calc(1rem * var(--sl-radius-scale));
+    --sl-radius-full: 9999px;
+
+    /* Shadows tint with the foreground so they read on both schemes. */
+    --sl-shadow-color: light-dark(oklch(20% 0.02 var(--sl-hue-neutral)), oklch(0% 0 0));
+    --sl-shadow-sm: 0 1px 2px color-mix(in oklch, var(--sl-shadow-color) 8%, transparent);
+    --sl-shadow-md: 0 2px 6px -1px color-mix(in oklch, var(--sl-shadow-color) 12%, transparent),
+                    0 1px 2px color-mix(in oklch, var(--sl-shadow-color) 6%, transparent);
+    --sl-shadow-lg: 0 12px 32px -8px color-mix(in oklch, var(--sl-shadow-color) 24%, transparent),
+                    0 2px 6px color-mix(in oklch, var(--sl-shadow-color) 8%, transparent);
+
+    /* Interactive control sizes. Minimum 24px target (WCAG 2.5.8); md is 40px.
+       Compact density scales these but never below the 24px floor. */
+    --sl-control-height-sm: max(1.5rem, calc(2rem * var(--sl-density)));
+    --sl-control-height-md: max(1.5rem, calc(2.5rem * var(--sl-density)));
+    --sl-control-height-lg: max(1.5rem, calc(3rem * var(--sl-density)));
+
+  }
+
+  /*
+   * Theme forcing. Because every color uses light-dark(), forcing a theme is
+   * nothing more than pinning the color-scheme. Works on :root or any subtree,
+   * so an inverted sidebar is `<aside data-theme="dark">`.
+   */
+  [data-theme="light"] { color-scheme: light; }
+  [data-theme="dark"]  { color-scheme: dark; }
+
+  /* True-black dark scheme for OLED screens. Surfaces still step up in lightness. */
+  [data-dark="black"] {
+    --sl-dark-bg-l: 4%;
+    --sl-dark-surface-l: 9%;
+    --sl-dark-raised-l: 14%;
+    --sl-dark-sunken-l: 2%;
+  }
+
+  /*
+   * More contrast: lifts secondary text, strengthens borders, widens the focus
+   * ring. Applied automatically for prefers-contrast: more, or manually with
+   * data-contrast="more" on any element. Not a full high-contrast theme.
+   */
+  @media (prefers-contrast: more) {
+    :root:not([data-contrast="less"]) {
+      --sl-muted-l: 32%;       --sl-muted-l-dark: 82%;
+      --sl-subtle-l: 40%;      --sl-subtle-l-dark: 75%;
+      --sl-border-l: 78%;      --sl-border-l-dark: 42%;
+      --sl-border-strong-l: 50%; --sl-border-strong-l-dark: 65%;
+      --sl-neutral-chroma: 0.006;
+      --sl-focus-ring: 3px solid var(--sl-color-focus);
+    }
+  }
+  [data-contrast="more"] {
+    --sl-muted-l: 32%;       --sl-muted-l-dark: 82%;
+    --sl-subtle-l: 40%;      --sl-subtle-l-dark: 75%;
+    --sl-border-l: 78%;      --sl-border-l-dark: 42%;
+    --sl-border-strong-l: 50%; --sl-border-strong-l-dark: 65%;
+    --sl-neutral-chroma: 0.006;
+    --sl-focus-ring: 3px solid var(--sl-color-focus);
+  }
+
+  /* Density: scales spacing and control heights (targets never drop below 24px). */
+  [data-density="compact"]     { --sl-density: 0.8; }
+  [data-density="comfortable"] { --sl-density: 1.15; }
+
+  /* Corner radius personality. */
+  [data-radius="none"]  { --sl-radius-scale: 0; }
+  [data-radius="sm"]    { --sl-radius-scale: 0.5; }
+  [data-radius="lg"]    { --sl-radius-scale: 1.5; }
+  [data-radius="full"]  { --sl-radius-scale: 3; }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --sl-duration-fast: 0ms;
+      --sl-duration: 0ms;
+      --sl-duration-slow: 0ms;
+    }
+  }
+}

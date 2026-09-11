@@ -1,0 +1,231 @@
+/*
+ * Dialog. Built on native <dialog> + showModal(): focus trapping, Escape,
+ * inertness of the page and the top layer all come from the platform.
+ * Enter/exit animation uses @starting-style + discrete transitions.
+ *
+ *   data-size: sm | md (default) | lg | xl | full
+ *   data-placement: center (default) | top
+ */
+@layer sl.components {
+  .sl-dialog {
+    --_max-width: 32rem;
+
+    inline-size: min(var(--_max-width), calc(100% - var(--sl-space-8)));
+    max-block-size: min(85dvh, calc(100% - var(--sl-space-8)));
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--sl-dialog-radius, var(--sl-radius-xl));
+    background-color: var(--sl-color-surface-raised);
+    color: var(--sl-color-fg);
+    box-shadow: var(--sl-shadow-lg);
+    border: 1px solid var(--sl-color-border);
+    overflow: hidden;
+
+    /* Exit state */
+    opacity: 0;
+    scale: 0.96;
+    translate: 0 0.5rem;
+    transition:
+      opacity var(--sl-duration) var(--sl-ease),
+      scale var(--sl-duration) var(--sl-ease),
+      translate var(--sl-duration) var(--sl-ease),
+      display var(--sl-duration) allow-discrete,
+      overlay var(--sl-duration) allow-discrete;
+
+    &[open] {
+      opacity: 1;
+      scale: 1;
+      translate: 0 0;
+
+      /* Enter state */
+      @starting-style {
+        opacity: 0;
+        scale: 0.96;
+        translate: 0 0.5rem;
+      }
+    }
+
+    &::backdrop {
+      background-color: var(--sl-color-backdrop);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      transition:
+        opacity var(--sl-duration) var(--sl-ease),
+        display var(--sl-duration) allow-discrete,
+        overlay var(--sl-duration) allow-discrete;
+    }
+    &[open]::backdrop {
+      opacity: 1;
+      @starting-style { opacity: 0; }
+    }
+
+    &[data-size="sm"] { --_max-width: 24rem; }
+    &[data-size="lg"] { --_max-width: 44rem; }
+    &[data-size="xl"] { --_max-width: 60rem; }
+    &[data-size="full"] {
+      --_max-width: 100%;
+      inline-size: calc(100% - var(--sl-space-8));
+      max-block-size: calc(100% - var(--sl-space-8));
+    }
+
+    &[data-placement="top"] {
+      margin-block-start: var(--sl-space-12);
+    }
+  }
+
+  .sl-dialog-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--sl-space-4);
+    padding: var(--sl-space-6);
+    padding-block-end: 0;
+  }
+
+  .sl-dialog-title {
+    font-size: var(--sl-text-lg);
+    font-weight: var(--sl-weight-semibold);
+    line-height: var(--sl-leading-tight);
+  }
+
+  .sl-dialog-description {
+    margin-block-start: var(--sl-space-1);
+    color: var(--sl-color-fg-muted);
+    font-size: var(--sl-text-sm);
+  }
+
+  .sl-dialog-close {
+    margin: calc(var(--sl-space-2) * -1);
+    margin-inline-start: 0;
+  }
+
+  .sl-dialog-body {
+    padding: var(--sl-space-6);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    font-size: var(--sl-text-sm);
+  }
+
+  .sl-dialog-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--sl-space-2);
+    padding: var(--sl-space-4) var(--sl-space-6);
+    border-block-start: 1px solid var(--sl-color-border);
+    background-color: var(--sl-color-surface-sunken);
+  }
+
+  /*
+   * Prevent background scroll while a modal is open. Hiding overflow removes
+   * the scrollbar, which would shift the page on the first frame, so the hook
+   * measures the scrollbar and we pad by that amount. Fixed-position elements
+   * (the dialog itself) are unaffected by this padding.
+   */
+  /*
+   * A closed dialog must not take space: our display:flex would otherwise beat
+   * the UA's dialog:not([open]) { display: none }. Declared on the closed
+   * state so the display transition with allow-discrete still animates.
+   */
+  .sl-dialog:not([open]),
+  .sl-sheet:not([open]) {
+    display: none;
+  }
+
+  html:has(.sl-dialog[open], .sl-sheet[open]) {
+    overflow: hidden;
+    padding-inline-end: var(--sl-scrollbar-width, 0px);
+  }
+}
+
+/*
+ * Sheet: a dialog docked to a viewport edge.
+ *   data-side: right (default) | left | top | bottom
+ */
+@layer sl.components {
+  .sl-sheet {
+    --_size: 24rem;
+
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    max-inline-size: none;
+    max-block-size: none;
+    inline-size: min(var(--_size), 100%);
+    block-size: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 0;
+    border-radius: 0;
+    background-color: var(--sl-color-surface-raised);
+    color: var(--sl-color-fg);
+    box-shadow: var(--sl-shadow-lg);
+    overflow: hidden;
+
+    /* Slide only; the backdrop does the fading. A fading panel reads as mushy. */
+    will-change: translate;
+    transition:
+      translate var(--sl-duration-slow) var(--sl-ease),
+      display var(--sl-duration-slow) allow-discrete,
+      overlay var(--sl-duration-slow) allow-discrete;
+
+    &[data-side="right"]  { inset-inline-start: auto; translate: 100% 0; }
+    &[data-side="left"]   { inset-inline-end: auto; translate: -100% 0; }
+    &[data-side="top"]    { inset-block-end: auto; inline-size: 100%; block-size: auto; max-block-size: 90dvh; translate: 0 -100%; }
+    &[data-side="bottom"] { inset-block-start: auto; inline-size: 100%; block-size: auto; max-block-size: 90dvh; translate: 0 100%; border-start-start-radius: var(--sl-radius-xl); border-start-end-radius: var(--sl-radius-xl); }
+
+    &[data-size="sm"] { --_size: 18rem; }
+    &[data-size="lg"] { --_size: 32rem; }
+    &[data-size="xl"] { --_size: 44rem; }
+
+    &[open] {
+      translate: 0 0;
+      @starting-style {
+        &[data-side="right"]  { translate: 100% 0; }
+        &[data-side="left"]   { translate: -100% 0; }
+        &[data-side="top"]    { translate: 0 -100%; }
+        &[data-side="bottom"] { translate: 0 100%; }
+      }
+    }
+
+    &::backdrop {
+      background-color: var(--sl-color-backdrop);
+      opacity: 0;
+      transition:
+        opacity var(--sl-duration-slow) var(--sl-ease),
+        display var(--sl-duration-slow) allow-discrete,
+        overlay var(--sl-duration-slow) allow-discrete;
+    }
+    &[open]::backdrop {
+      opacity: 1;
+      @starting-style { opacity: 0; }
+    }
+
+    > .sl-dialog-body { flex: 1; }
+    > .sl-dialog-footer { margin-block-start: auto; }
+  }
+
+}
+
+/* Alert dialog: a confirm with an icon and the safe action focused first. */
+@layer sl.components {
+  .sl-dialog[role="alertdialog"] {
+    --_accent: var(--sl-color-danger);
+
+    > .sl-dialog-header { gap: var(--sl-space-3); }
+    .sl-alert-dialog-icon {
+      flex: none;
+      display: grid;
+      place-items: center;
+      inline-size: 2.5rem;
+      block-size: 2.5rem;
+      border-radius: var(--sl-radius-full);
+      background-color: color-mix(in oklch, var(--_accent) 15%, transparent);
+      color: var(--_accent);
+      > svg { inline-size: 1.25rem; block-size: 1.25rem; }
+    }
+    &[data-color="warning"] { --_accent: var(--sl-color-warning-text); }
+    &[data-color="info"]    { --_accent: var(--sl-color-info); }
+    &[data-color="accent"]  { --_accent: var(--sl-color-accent); }
+  }
+}

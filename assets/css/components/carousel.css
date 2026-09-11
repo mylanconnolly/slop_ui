@@ -1,0 +1,74 @@
+/* Carousel: a scroll-snap track plus controls. --sl-carousel-per-view sets slides per view. */
+@layer sl.components {
+  .sl-carousel {
+    --_gap: var(--sl-space-4);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--sl-space-3);
+    min-inline-size: 0;
+  }
+
+  .sl-carousel-track {
+    display: flex;
+    gap: var(--_gap);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    border-radius: var(--sl-radius-md);
+
+    &::-webkit-scrollbar { display: none; }
+    &:focus-visible { outline-offset: 2px; }
+  }
+
+  .sl-carousel-slide {
+    flex: 0 0 calc((100% - var(--_gap) * (var(--sl-carousel-per-view, 1) - 1)) / var(--sl-carousel-per-view, 1));
+    min-inline-size: 0;
+    scroll-snap-align: start;
+  }
+
+  .sl-carousel-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sl-space-2);
+  }
+
+  .sl-carousel-dots {
+    display: flex;
+    gap: var(--sl-space-1);
+    padding: var(--sl-space-1);
+  }
+
+  .sl-carousel-dot {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: var(--sl-radius-full);
+    background-color: var(--sl-color-border-strong);
+    cursor: pointer;
+    transition: inline-size var(--sl-duration) var(--sl-ease), background-color var(--sl-duration-fast) var(--sl-ease);
+
+    /* Bigger hit area than the visible dot (WCAG 2.5.8). */
+    position: relative;
+    &::after { content: ""; position: absolute; inset: -0.5rem; }
+
+    &[aria-selected="true"] {
+      inline-size: 1.25rem;
+      background-color: var(--sl-color-accent);
+    }
+    &:focus-visible { outline-offset: 3px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sl-carousel-track { scroll-behavior: auto; }
+  }
+
+  @media (forced-colors: active) {
+    .sl-carousel-dot { background-color: ButtonText; }
+    .sl-carousel-dot[aria-selected="true"] { background-color: Highlight; }
+  }
+}

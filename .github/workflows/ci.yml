@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Elixir ${{ matrix.elixir }} / OTP ${{ matrix.otp }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - elixir: '1.18'
+            otp: '27'
+          - elixir: '1.20'
+            otp: '29'
+    env:
+      MIX_ENV: test
+    steps:
+      - uses: actions/checkout@v6
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - run: mix deps.get
+      - run: mix deps.compile
+      - run: mix format --check-formatted
+      - run: mix compile --warnings-as-errors
+      - run: mix test --warnings-as-errors
+      - run: mix assets.test
+
+  release-check:
+    name: Docs, package, and Phoenix installation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.20'
+          otp-version: '29'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - run: mix deps.get
+      - run: mix deps.compile
+      - run: mix compile --warnings-as-errors
+      - run: mix docs --warnings-as-errors
+      - run: mix archive.install hex phx_new 1.8.9 --force
+      - run: bash dev/release/check_consumer.sh
+
+  browser:
+    name: Chrome interactions and palette contrast
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.20'
+          otp-version: '29'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Locate runner Chrome
+        run: echo "CHROME_BIN=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - run: mix deps.get
+      - run: mix sink.smoke
+      - run: mix sink.audit

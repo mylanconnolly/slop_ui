@@ -1,0 +1,232 @@
+/*
+ * Button. Variant × color is a matrix, and the matrix is cheap because each
+ * color family only assigns private custom properties; each variant only
+ * decides which of those properties to paint with.
+ *
+ *   data-variant: solid (default) | soft | outline | ghost | link
+ *   data-color:   neutral (default) | accent | success | warning | danger | info
+ *   data-size:    sm | md (default) | lg
+ *   data-icon:    present = square icon-only button (needs aria-label)
+ *   data-loading: present = shows spinner, aria-busy should be set
+ */
+@layer sl.components {
+  .sl-button {
+    /* Color family (defaults to neutral) */
+    --_solid: var(--sl-color-neutral);
+    --_solid-hover: var(--sl-color-neutral-hover);
+    --_solid-active: var(--sl-color-neutral-active);
+    --_solid-fg: var(--sl-color-neutral-fg);
+    --_soft: var(--sl-color-neutral-soft);
+    --_soft-hover: var(--sl-color-neutral-soft-hover);
+    --_soft-fg: var(--sl-color-neutral-soft-fg);
+    --_text: var(--sl-color-neutral-text);
+
+    /* Resolved paint (variant picks these) */
+    --_bg: var(--_solid);
+    --_bg-hover: var(--_solid-hover);
+    --_bg-active: var(--_solid-active);
+    --_fg: var(--_solid-fg);
+    --_border: transparent;
+
+    --_height: var(--sl-control-height-md);
+    --_padding-inline: var(--sl-button-padding-inline, var(--sl-space-4));
+    --_font-size: var(--sl-text-sm);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sl-space-2);
+    min-block-size: var(--_height);
+    padding-inline: var(--_padding-inline);
+    padding-block: 0;
+    border: 1px solid var(--_border);
+    border-radius: var(--sl-button-radius, var(--sl-control-radius));
+    background-color: var(--_bg);
+    color: var(--_fg);
+    font-size: var(--_font-size);
+    font-weight: var(--sl-weight-medium);
+    line-height: 1;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color var(--sl-duration-fast) var(--sl-ease),
+      border-color var(--sl-duration-fast) var(--sl-ease),
+      color var(--sl-duration-fast) var(--sl-ease),
+      scale var(--sl-duration-fast) var(--sl-ease);
+
+    &:hover { background-color: var(--_bg-hover); }
+    &:active { background-color: var(--_bg-active); scale: 0.98; }
+
+    &:disabled,
+    &[aria-disabled="true"] {
+      opacity: 0.5;
+      cursor: not-allowed;
+      scale: 1;
+      background-color: var(--_bg);
+    }
+
+    /* ---- Color families ---- */
+    &[data-color="accent"] {
+      --_solid: var(--sl-color-accent);
+      --_solid-hover: var(--sl-color-accent-hover);
+      --_solid-active: var(--sl-color-accent-active);
+      --_solid-fg: var(--sl-color-accent-fg);
+      --_soft: var(--sl-color-accent-soft);
+      --_soft-hover: var(--sl-color-accent-soft-hover);
+      --_soft-fg: var(--sl-color-accent-soft-fg);
+      --_text: var(--sl-color-accent-text);
+    }
+    &[data-color="success"] {
+      --_solid: var(--sl-color-success);
+      --_solid-hover: var(--sl-color-success-hover);
+      --_solid-active: var(--sl-color-success-active);
+      --_solid-fg: var(--sl-color-success-fg);
+      --_soft: var(--sl-color-success-soft);
+      --_soft-hover: var(--sl-color-success-soft-hover);
+      --_soft-fg: var(--sl-color-success-soft-fg);
+      --_text: var(--sl-color-success-text);
+    }
+    &[data-color="warning"] {
+      --_solid: var(--sl-color-warning);
+      --_solid-hover: var(--sl-color-warning-hover);
+      --_solid-active: var(--sl-color-warning-active);
+      --_solid-fg: var(--sl-color-warning-fg);
+      --_soft: var(--sl-color-warning-soft);
+      --_soft-hover: var(--sl-color-warning-soft-hover);
+      --_soft-fg: var(--sl-color-warning-soft-fg);
+      --_text: var(--sl-color-warning-text);
+    }
+    &[data-color="danger"] {
+      --_solid: var(--sl-color-danger);
+      --_solid-hover: var(--sl-color-danger-hover);
+      --_solid-active: var(--sl-color-danger-active);
+      --_solid-fg: var(--sl-color-danger-fg);
+      --_soft: var(--sl-color-danger-soft);
+      --_soft-hover: var(--sl-color-danger-soft-hover);
+      --_soft-fg: var(--sl-color-danger-soft-fg);
+      --_text: var(--sl-color-danger-text);
+    }
+    &[data-color="info"] {
+      --_solid: var(--sl-color-info);
+      --_solid-hover: var(--sl-color-info-hover);
+      --_solid-active: var(--sl-color-info-active);
+      --_solid-fg: var(--sl-color-info-fg);
+      --_soft: var(--sl-color-info-soft);
+      --_soft-hover: var(--sl-color-info-soft-hover);
+      --_soft-fg: var(--sl-color-info-soft-fg);
+      --_text: var(--sl-color-info-text);
+    }
+
+    /* ---- Variants ---- */
+    &[data-variant="soft"] {
+      --_bg: var(--_soft);
+      --_bg-hover: var(--_soft-hover);
+      --_bg-active: var(--_soft-hover);
+      --_fg: var(--_soft-fg);
+    }
+    &[data-variant="outline"] {
+      --_bg: transparent;
+      --_bg-hover: var(--_soft);
+      --_bg-active: var(--_soft-hover);
+      --_fg: var(--_text);
+      --_border: var(--sl-color-border-strong);
+    }
+    &[data-variant="ghost"] {
+      --_bg: transparent;
+      --_bg-hover: var(--_soft);
+      --_bg-active: var(--_soft-hover);
+      --_fg: var(--_text);
+    }
+    &[data-variant="link"] {
+      --_bg: transparent;
+      --_bg-hover: transparent;
+      --_bg-active: transparent;
+      --_fg: var(--_text);
+      --_padding-inline: 0;
+      min-block-size: var(--_height);
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+      &:hover { text-decoration-thickness: 2px; }
+      &:active { scale: 1; }
+    }
+
+    /* ---- Sizes ---- */
+    &[data-size="sm"] {
+      --_height: var(--sl-control-height-sm);
+      --_padding-inline: var(--sl-button-padding-inline, var(--sl-space-3));
+      --_font-size: var(--sl-text-xs);
+      border-radius: var(--sl-button-radius, var(--sl-radius-sm));
+    }
+    &[data-size="lg"] {
+      --_height: var(--sl-control-height-lg);
+      --_padding-inline: var(--sl-button-padding-inline, var(--sl-space-6));
+      --_font-size: var(--sl-text-md);
+    }
+
+    /* Link buttons retain the same hit area, without size-specific side padding. */
+    &[data-variant="link"] { --_padding-inline: 0; }
+
+    /* Icon-only: square */
+    &[data-icon] {
+      --_padding-inline: 0;
+      inline-size: var(--_height);
+      aspect-ratio: 1;
+      flex-shrink: 0;
+    }
+
+    /* Icons inside buttons inherit size from font */
+    > svg {
+      inline-size: 1.15em;
+      block-size: 1.15em;
+      flex: none;
+    }
+
+    /* ---- Loading ---- */
+    &[data-loading] {
+      opacity: 1;
+      position: relative;
+      color: transparent;
+      pointer-events: none;
+
+      > * { visibility: hidden; }
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        inline-size: 1.1em;
+        block-size: 1.1em;
+        border: 2px solid var(--_fg);
+        border-inline-end-color: transparent;
+        border-radius: var(--sl-radius-full);
+        animation: sl-spin 700ms linear infinite;
+      }
+    }
+  }
+
+  /* Adjacent buttons of equal height read as a group. */
+  .sl-button-group {
+    display: inline-flex;
+
+    > .sl-button {
+      &:not(:first-child) {
+        border-start-start-radius: 0;
+        border-end-start-radius: 0;
+        margin-inline-start: -1px;
+      }
+      &:not(:last-child) {
+        border-start-end-radius: 0;
+        border-end-end-radius: 0;
+      }
+      &:focus-visible { z-index: 1; }
+    }
+  }
+
+  @keyframes sl-spin {
+    to { rotate: 1turn; }
+  }
+}

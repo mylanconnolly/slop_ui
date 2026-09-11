@@ -1,0 +1,75 @@
+@layer sl.components {
+  .sl-card {
+    --_padding: var(--sl-card-padding, var(--sl-space-6));
+
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--sl-color-border);
+    border-radius: var(--sl-card-radius, var(--sl-radius-lg));
+    background-color: var(--sl-color-surface);
+    color: var(--sl-color-fg);
+    box-shadow: var(--sl-shadow-sm);
+
+    &[data-variant="outline"] { box-shadow: none; }
+    &[data-variant="elevated"] { border-color: transparent; box-shadow: var(--sl-shadow-lg); }
+    &[data-variant="sunken"] { background-color: var(--sl-color-surface-sunken); box-shadow: none; }
+
+    &[data-padding="sm"] { --_padding: var(--sl-space-4); }
+    &[data-padding="lg"] { --_padding: var(--sl-space-8); }
+    &[data-padding="none"] { --_padding: 0; }
+  }
+
+  /*
+   * Card internals are donut-scoped: a card nested inside a card body should
+   * not inherit the outer card's header rules. Browsers without @scope simply
+   * drop this block, so the plain child selectors above it carry the base.
+   */
+  .sl-card-header,
+  .sl-card-body,
+  .sl-card-footer {
+    padding: var(--_padding);
+  }
+
+  .sl-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--sl-space-4);
+    padding-block-end: 0;
+  }
+
+  .sl-card-header:has(+ .sl-card-body) { padding-block-end: 0; }
+  .sl-card-body + .sl-card-footer,
+  .sl-card-header + .sl-card-footer { padding-block-start: 0; }
+
+  .sl-card-title {
+    font-size: var(--sl-text-lg);
+    font-weight: var(--sl-weight-semibold);
+    line-height: var(--sl-leading-tight);
+  }
+
+  .sl-card-description {
+    margin-block-start: var(--sl-space-1);
+    color: var(--sl-color-fg-muted);
+    font-size: var(--sl-text-sm);
+  }
+
+  .sl-card-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--sl-space-2);
+
+    &[data-justify="end"] { justify-content: flex-end; }
+    &[data-justify="between"] { justify-content: space-between; }
+  }
+
+  @scope (.sl-card) to (.sl-card-body) {
+    .sl-card-footer[data-divider] {
+      border-block-start: 1px solid var(--sl-color-border);
+      padding-block-start: var(--_padding);
+      background-color: var(--sl-color-surface-sunken);
+      border-end-start-radius: inherit;
+      border-end-end-radius: inherit;
+    }
+  }
+}

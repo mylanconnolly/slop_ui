@@ -1,0 +1,239 @@
+/*
+ * Input adornments, slider, number input.
+ */
+@layer sl.components {
+  /* ---- Input group: prefix/suffix adornments inside the field frame ---- */
+  .sl-input-group {
+    --_border: var(--sl-color-border-strong);
+
+    display: flex;
+    align-items: stretch;
+    inline-size: 100%;
+    min-block-size: var(--sl-control-height-md);
+    border: 1px solid var(--_border);
+    border-radius: var(--sl-input-radius, var(--sl-control-radius));
+    background-color: var(--sl-color-surface);
+    box-shadow: var(--sl-input-shadow, none);
+    /* Clip adornments (a select's sunken fill, a button's hover) to the rounded frame. */
+    overflow: hidden;
+    transition: border-color var(--sl-duration-fast) var(--sl-ease);
+
+    &:hover { --_border: color-mix(in oklch, var(--sl-color-border-strong), var(--sl-color-fg) 20%); }
+    &:has(:focus-visible) { --_border: var(--sl-color-focus); outline: var(--sl-focus-ring); outline-offset: 0; }
+    &:has([aria-invalid="true"]) { --_border: var(--sl-color-danger); &:has(:focus-visible) { outline-color: var(--sl-color-danger); } }
+    &:has(:disabled) { opacity: 0.6; background-color: var(--sl-color-surface-sunken); }
+
+    /* The control itself gives up its own frame. */
+    > .sl-input, > .sl-native-select, > .sl-textarea {
+      flex: 1;
+      min-inline-size: 0;
+      min-block-size: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      &:focus-visible { outline: none; }
+    }
+    > :first-child { border-start-start-radius: inherit; border-end-start-radius: inherit; }
+    > :last-child { border-start-end-radius: inherit; border-end-end-radius: inherit; }
+
+    &[data-size="sm"] { min-block-size: var(--sl-control-height-sm); }
+    &[data-size="lg"] { min-block-size: var(--sl-control-height-lg); }
+  }
+
+  .sl-input-adornment {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sl-space-1);
+    padding-inline: var(--sl-space-3);
+    color: var(--sl-color-fg-muted);
+    font-size: var(--sl-text-sm);
+    white-space: nowrap;
+    user-select: none;
+
+    > svg { inline-size: 1rem; block-size: 1rem; }
+
+    /* Adornments that are controls (buttons, selects) get a divider and no padding. */
+    &[data-interactive] {
+      padding: 0;
+      > .sl-button { block-size: 100%; border-radius: 0; --_padding-inline: var(--sl-space-3); }
+      > .sl-native-select { block-size: 100%; border: 0; box-shadow: none; border-radius: 0; background-color: var(--sl-color-surface-sunken); }
+      /* The group is overflow-clipped, so inner focus rings must sit inside their box. */
+      > .sl-button:focus-visible, > .sl-native-select:focus-visible { outline-offset: -2px; border-radius: 0; }
+    }
+    &[data-interactive]:first-child { border-inline-end: 1px solid var(--sl-color-border); }
+    &[data-interactive]:last-child { border-inline-start: 1px solid var(--sl-color-border); }
+    &:first-child:not([data-interactive]) { padding-inline-end: 0; }
+    &:last-child:not([data-interactive]) { padding-inline-start: 0; }
+  }
+
+  /* ---- Slider (native range) ---- */
+  .sl-slider {
+    --_track: var(--sl-color-neutral-soft);
+    --_fill: var(--sl-color-accent);
+    --_thumb: 1.25rem;
+    --_pct: 0%;
+
+    appearance: none;
+    inline-size: 100%;
+    block-size: var(--_thumb);
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+
+    &::-webkit-slider-runnable-track {
+      block-size: 0.375rem;
+      border-radius: var(--sl-radius-full);
+      background: linear-gradient(to right, var(--_fill) var(--_pct), var(--_track) var(--_pct));
+    }
+    &::-moz-range-track {
+      block-size: 0.375rem;
+      border-radius: var(--sl-radius-full);
+      background: var(--_track);
+    }
+    &::-moz-range-progress { block-size: 0.375rem; border-radius: var(--sl-radius-full); background: var(--_fill); }
+
+    &::-webkit-slider-thumb {
+      appearance: none;
+      inline-size: var(--_thumb);
+      block-size: var(--_thumb);
+      margin-block-start: calc((0.375rem - var(--_thumb)) / 2);
+      border: 2px solid var(--_fill);
+      border-radius: var(--sl-radius-full);
+      background: var(--sl-color-surface);
+      box-shadow: var(--sl-shadow-md);
+      transition: scale var(--sl-duration-fast) var(--sl-ease);
+    }
+    &::-moz-range-thumb {
+      inline-size: var(--_thumb);
+      block-size: var(--_thumb);
+      border: 2px solid var(--_fill);
+      border-radius: var(--sl-radius-full);
+      background: var(--sl-color-surface);
+      box-shadow: var(--sl-shadow-md);
+    }
+    &:hover::-webkit-slider-thumb, &:active::-webkit-slider-thumb { scale: 1.1; }
+
+    &:focus-visible { outline: none; }
+    &:focus-visible::-webkit-slider-thumb { outline: var(--sl-focus-ring); outline-offset: var(--sl-focus-offset); }
+    &:focus-visible::-moz-range-thumb { outline: var(--sl-focus-ring); outline-offset: var(--sl-focus-offset); }
+
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &[data-color="success"] { --_fill: var(--sl-color-success); }
+    &[data-color="danger"]  { --_fill: var(--sl-color-danger); }
+  }
+
+  .sl-slider-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sl-space-3);
+    > output { min-inline-size: 3ch; text-align: end; font-variant-numeric: tabular-nums; font-size: var(--sl-text-sm); color: var(--sl-color-fg-muted); }
+  }
+
+  .sl-slider-marks {
+    display: flex;
+    justify-content: space-between;
+    padding-inline: calc(var(--_thumb, 1.25rem) / 2);
+    color: var(--sl-color-fg-subtle);
+    font-size: var(--sl-text-xs);
+  }
+
+  /* ---- Number input ---- */
+  .sl-number {
+    > .sl-input {
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      appearance: textfield;
+      &::-webkit-inner-spin-button, &::-webkit-outer-spin-button { appearance: none; margin: 0; }
+    }
+    > .sl-input-adornment > .sl-button { min-inline-size: var(--sl-control-height-md); }
+  }
+
+  /* ---- Color input ---- */
+  .sl-color {
+    --_swatch-size: var(--sl-control-height-md);
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sl-space-3);
+
+    &[data-size="sm"] { --_swatch-size: var(--sl-control-height-sm); }
+    &[data-size="lg"] { --_swatch-size: var(--sl-control-height-lg); }
+  }
+
+  .sl-color-swatch {
+    display: inline-flex;
+    inline-size: var(--_swatch-size);
+    block-size: var(--_swatch-size);
+    border: 1px solid var(--sl-color-border-strong);
+    border-radius: var(--sl-input-radius, var(--sl-control-radius));
+    background-color: var(--sl-color-surface);
+    box-shadow: var(--sl-input-shadow, none);
+    overflow: hidden;
+    cursor: pointer;
+
+    &:has(:focus-visible) { outline: 2px solid var(--sl-color-focus); outline-offset: 2px; }
+    &:has(:disabled) { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  .sl-color-input {
+    appearance: none;
+    inline-size: 100%;
+    block-size: 100%;
+    padding: 0.2rem;
+    border: 0;
+    background: transparent;
+    cursor: inherit;
+
+    &::-webkit-color-swatch-wrapper { padding: 0; }
+    &::-webkit-color-swatch { border: 0; border-radius: calc(var(--sl-input-radius, var(--sl-control-radius)) - 0.2rem); }
+    &::-moz-color-swatch { border: 0; border-radius: calc(var(--sl-input-radius, var(--sl-control-radius)) - 0.2rem); }
+  }
+
+  .sl-color-value {
+    font-family: var(--sl-font-mono);
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-fg-muted);
+    text-transform: uppercase;
+  }
+
+  .sl-color-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sl-space-2);
+  }
+
+  .sl-color-preset {
+    display: inline-grid;
+    place-items: center;
+    inline-size: calc(var(--_swatch-size) * 0.7);
+    block-size: calc(var(--_swatch-size) * 0.7);
+    padding: 0;
+    border: 1px solid var(--sl-color-border-strong);
+    border-radius: var(--sl-radius-full);
+    background-color: var(--_swatch);
+    cursor: pointer;
+    transition: scale var(--sl-duration-fast) var(--sl-ease-spring);
+
+    /* Checkmark: white on dark swatches, black on light ones (relative color
+       syntax); a drop shadow keeps it readable where that is unsupported. */
+    color: white;
+    filter: drop-shadow(0 0 1px oklch(0% 0 0 / 0.6));
+    @supports (color: oklch(from red calc(l * 1) c h)) {
+      color: oklch(from var(--_swatch) clamp(0, (0.65 - l) * 1000, 1) 0 0);
+      filter: none;
+    }
+
+    > svg { inline-size: 60%; block-size: 60%; opacity: 0; transition: opacity var(--sl-duration-fast) var(--sl-ease); }
+    &[aria-checked="true"] > svg { opacity: 1; }
+    &:hover { scale: 1.1; }
+    &:focus-visible { outline: 2px solid var(--sl-color-focus); outline-offset: 2px; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; scale: 1; }
+  }
+
+  @media (forced-colors: active) {
+    .sl-color-preset { forced-color-adjust: none; border-color: ButtonText; }
+    .sl-color-preset[aria-checked="true"] { outline: 2px solid Highlight; outline-offset: 1px; }
+  }
+}

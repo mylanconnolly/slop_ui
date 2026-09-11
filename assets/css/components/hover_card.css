@@ -1,0 +1,63 @@
+/*
+ * Hover card: a rich preview anchored to its trigger, shown on hover/focus.
+ *   data-placement on .sl-hover-card-panel: bottom-start (default) | bottom | bottom-end | top-start | top | top-end
+ */
+@layer sl.components {
+  /* Must generate a box so anchor-name has something to anchor to. */
+  .sl-hover-card {
+    display: inline-block;
+  }
+
+  .sl-hover-card-panel {
+    --_offset: var(--sl-space-2);
+
+    position: fixed;
+    inset: auto;
+    inline-size: max-content;
+    min-inline-size: 14rem;
+    max-inline-size: min(20rem, calc(100vw - var(--sl-space-8)));
+    max-block-size: min(24rem, calc(100vh - var(--sl-space-8)));
+    overflow: auto;
+    padding: var(--sl-space-4);
+    border: 1px solid var(--sl-color-border);
+    border-radius: var(--sl-radius-lg);
+    background-color: var(--sl-color-surface-raised);
+    color: var(--sl-color-fg);
+    box-shadow: var(--sl-shadow-lg);
+    font-size: var(--sl-text-sm);
+
+    opacity: 0;
+    scale: 0.97;
+    translate: 0 -4px;
+    transform-origin: top;
+    transition:
+      opacity var(--sl-duration) var(--sl-ease),
+      scale var(--sl-duration) var(--sl-ease),
+      translate var(--sl-duration) var(--sl-ease),
+      display var(--sl-duration) allow-discrete,
+      overlay var(--sl-duration) allow-discrete;
+
+    &:popover-open {
+      opacity: 1;
+      scale: 1;
+      translate: 0 0;
+      @starting-style { opacity: 0; scale: 0.97; translate: 0 -4px; }
+    }
+
+    &[data-placement^="top"] { transform-origin: bottom; translate: 0 4px; }
+    &[data-placement^="top"]:popover-open { translate: 0 0; }
+
+    @supports (anchor-name: none) {
+      position-anchor: var(--sl-anchor);
+      position-area: block-end span-inline-end;
+      margin-block-start: var(--_offset);
+      position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+
+      &[data-placement="bottom"]     { position-area: block-end; }
+      &[data-placement="bottom-end"] { position-area: block-end span-inline-start; }
+      &[data-placement="top-start"]  { position-area: block-start span-inline-end; margin-block: 0 var(--_offset); }
+      &[data-placement="top"]        { position-area: block-start; margin-block: 0 var(--_offset); }
+      &[data-placement="top-end"]    { position-area: block-start span-inline-start; margin-block: 0 var(--_offset); }
+    }
+  }
+}

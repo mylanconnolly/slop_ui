@@ -1,0 +1,76 @@
+@layer sl.reset {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+    tab-size: 4;
+  }
+
+  body {
+    margin: 0;
+    min-block-size: 100dvh;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd, pre {
+    margin: 0;
+  }
+
+  ul[role="list"], ol[role="list"] {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  img, picture, video, canvas, svg {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  input, button, textarea, select {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+  }
+
+  button {
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+
+  textarea:not([rows]) {
+    min-block-size: 6em;
+  }
+
+  :target {
+    scroll-margin-block: 5ex;
+  }
+
+  dialog {
+    margin: auto;
+    padding: 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
+  }
+
+  [popover] {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
+  }
+
+  hr {
+    border: 0;
+    border-block-start: 1px solid var(--sl-color-border);
+  }
+}

@@ -1,0 +1,160 @@
+/*
+ * Dropdown menu. The list is a `popover` (top layer, light dismiss, Escape)
+ * positioned with CSS anchor positioning. Browsers without anchor support get
+ * a JS-computed position from the hook.
+ *
+ *   data-placement on .sl-menu-list: bottom-start (default) | bottom-end | top-start | top-end
+ */
+@layer sl.components {
+  .sl-menu {
+    display: inline-block;
+    position: relative;
+  }
+
+  .sl-menu-list {
+    --_offset: var(--sl-space-1);
+
+    position: fixed;
+    inset: auto;
+    min-inline-size: 10rem;
+    max-inline-size: min(20rem, calc(100vw - var(--sl-space-8)));
+    max-block-size: min(24rem, calc(100vh - var(--sl-space-8)));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--sl-space-1);
+    border: 1px solid var(--sl-color-border);
+    border-radius: var(--sl-menu-radius, var(--sl-radius-md));
+    background-color: var(--sl-color-surface-raised);
+    color: var(--sl-color-fg);
+    box-shadow: var(--sl-shadow-lg);
+    font-size: var(--sl-text-sm);
+
+    /* Exit state */
+    opacity: 0;
+    scale: 0.96;
+    transform-origin: top;
+    transition:
+      opacity var(--sl-duration-fast) var(--sl-ease),
+      scale var(--sl-duration-fast) var(--sl-ease),
+      display var(--sl-duration-fast) allow-discrete,
+      overlay var(--sl-duration-fast) allow-discrete;
+
+    &:popover-open {
+      opacity: 1;
+      scale: 1;
+      @starting-style {
+        opacity: 0;
+        scale: 0.96;
+      }
+    }
+
+    &[data-placement^="top"] { transform-origin: bottom; }
+
+    /*
+     * Anchor positioning. The hook sets `anchor-name` on the trigger and
+     * `position-anchor` here (always explicit; the initial value differed
+     * between engines before mid-2026). Fallbacks flip the menu when it would
+     * overflow the viewport.
+     */
+    @supports (anchor-name: none) {
+      position-anchor: var(--sl-anchor);
+      position-area: block-end span-inline-end;
+      margin-block-start: var(--_offset);
+      position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+
+      &[data-placement="bottom-end"] { position-area: block-end span-inline-start; }
+      &[data-placement="top-start"]  { position-area: block-start span-inline-end; margin-block: 0 var(--_offset); }
+      &[data-placement="top-end"]    { position-area: block-start span-inline-start; margin-block: 0 var(--_offset); }
+      /* Submenus open beside their item, top-aligned, flipping to the other side when cramped. */
+      &[data-placement="right-start"] {
+        position-area: inline-end span-block-end;
+        margin-block-start: calc(var(--sl-space-1) * -1);
+        margin-inline-start: var(--sl-space-1);
+        position-try-fallbacks: flip-inline, flip-block, flip-inline flip-block;
+        transform-origin: top left;
+      }
+    }
+  }
+
+  /* Context menus are placed by the hook at the pointer (or the focused element). */
+  .sl-context-menu { display: block; }
+  .sl-context-menu-target {
+    display: block;
+    border-radius: var(--sl-radius-md);
+    &:focus-visible { outline: var(--sl-focus-ring); outline-offset: 2px; }
+  }
+  .sl-menu-list[data-placement="pointer"] {
+    transform-origin: top left;
+    @supports (anchor-name: none) {
+      position-anchor: auto;
+      position-area: none;
+      position-try-fallbacks: none;
+      margin: 0;
+    }
+  }
+
+  .sl-menu-sub { display: contents; }
+  .sl-menu-sub-chevron { margin-inline-start: auto; inline-size: 0.875rem; block-size: 0.875rem; color: var(--sl-color-fg-subtle); }
+  .sl-menu-item[aria-expanded="true"] { background-color: var(--sl-color-neutral-soft); }
+  .sl-menu-item-label { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .sl-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--sl-space-2);
+    inline-size: 100%;
+    min-block-size: var(--sl-control-height-sm);
+    padding-inline: var(--sl-space-2);
+    border-radius: var(--sl-radius-sm);
+    color: inherit;
+    text-align: start;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+
+    > svg { inline-size: 1rem; block-size: 1rem; flex: none; color: var(--sl-color-fg-muted); }
+
+    /* Both keyboard (roving focus) and pointer highlight the same way. */
+    &:hover,
+    &:focus-visible,
+    &[data-active] {
+      background-color: var(--sl-color-neutral-soft);
+    }
+    &:focus-visible {
+      outline: var(--sl-focus-ring);
+      outline-offset: -2px;
+    }
+
+    &[data-color="danger"] {
+      color: var(--sl-color-danger-text);
+      > svg { color: inherit; }
+      &:hover, &:focus-visible, &[data-active] { background-color: var(--sl-color-danger-soft); }
+    }
+
+    &[aria-disabled="true"],
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background-color: transparent;
+    }
+
+    kbd {
+      margin-inline-start: auto;
+      color: var(--sl-color-fg-subtle);
+      font-size: var(--sl-text-xs);
+    }
+  }
+
+  .sl-menu-label {
+    padding: var(--sl-space-2);
+    padding-block-end: var(--sl-space-1);
+    color: var(--sl-color-fg-subtle);
+    font-size: var(--sl-text-xs);
+    font-weight: var(--sl-weight-medium);
+  }
+
+  .sl-menu-separator {
+    margin-block: var(--sl-space-1);
+    margin-inline: calc(var(--sl-space-1) * -1);
+  }
+}

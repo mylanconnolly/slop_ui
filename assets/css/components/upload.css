@@ -1,0 +1,83 @@
+/*
+ * File upload: dropzone + entry list, on top of LiveView uploads.
+ */
+@layer sl.components {
+  .sl-dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sl-space-1);
+    min-block-size: 8rem;
+    padding: var(--sl-space-6);
+    border: 2px dashed var(--sl-color-border-strong);
+    border-radius: var(--sl-radius-lg);
+    background-color: var(--sl-color-surface);
+    color: var(--sl-color-fg-muted);
+    font-size: var(--sl-text-sm);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color var(--sl-duration-fast) var(--sl-ease), background-color var(--sl-duration-fast) var(--sl-ease);
+
+    > svg { inline-size: 2rem; block-size: 2rem; color: var(--sl-color-fg-subtle); margin-block-end: var(--sl-space-1); }
+
+    &:hover, &[data-dragging] {
+      border-color: var(--sl-color-accent);
+      background-color: var(--sl-color-accent-soft);
+      color: var(--sl-color-accent-soft-fg);
+      > svg { color: var(--sl-color-accent-text); }
+    }
+    &:has(:focus-visible) { outline: var(--sl-focus-ring); outline-offset: var(--sl-focus-offset); }
+    &[aria-invalid="true"] { border-color: var(--sl-color-danger); }
+    &[data-compact] { flex-direction: row; min-block-size: auto; padding: var(--sl-space-3) var(--sl-space-4); > svg { inline-size: 1.25rem; block-size: 1.25rem; margin: 0; } }
+  }
+
+  .sl-dropzone-title { color: var(--sl-color-fg); font-weight: var(--sl-weight-medium); }
+  .sl-dropzone-title > .sl-dropzone-browse { color: var(--sl-color-accent-text); text-decoration: underline; text-underline-offset: 0.15em; cursor: pointer; }
+  .sl-dropzone-hint { font-size: var(--sl-text-xs); color: var(--sl-color-fg-subtle); }
+
+  .sl-upload-entries {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sl-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sl-upload-entry {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "preview meta actions" "preview progress actions" "preview errors actions";
+    column-gap: var(--sl-space-3);
+    row-gap: var(--sl-space-1);
+    align-items: center;
+    padding: var(--sl-space-3);
+    border: 1px solid var(--sl-color-border);
+    border-radius: var(--sl-radius-md);
+    background-color: var(--sl-color-surface);
+    font-size: var(--sl-text-sm);
+
+    &[data-done] { border-color: color-mix(in oklch, var(--sl-color-success) 40%, transparent); }
+    &[aria-invalid="true"] { border-color: var(--sl-color-danger); }
+  }
+  .sl-upload-preview {
+    grid-area: preview;
+    display: grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border-radius: var(--sl-radius-sm);
+    background-color: var(--sl-color-surface-sunken);
+    color: var(--sl-color-fg-subtle);
+    overflow: hidden;
+    > img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+    > svg { inline-size: 1.25rem; block-size: 1.25rem; }
+  }
+  .sl-upload-meta { grid-area: meta; display: flex; justify-content: space-between; gap: var(--sl-space-3); min-inline-size: 0; }
+  .sl-upload-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: var(--sl-weight-medium); }
+  .sl-upload-size { flex: none; color: var(--sl-color-fg-subtle); font-size: var(--sl-text-xs); font-variant-numeric: tabular-nums; }
+  .sl-upload-progress { grid-area: progress; }
+  .sl-upload-errors { grid-area: errors; display: flex; flex-direction: column; gap: 2px; }
+  .sl-upload-actions { grid-area: actions; }
+}

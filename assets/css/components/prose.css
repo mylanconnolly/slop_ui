@@ -1,0 +1,114 @@
+/*
+ * Prose: long-form text styling for rendered Markdown (or any HTML you don't
+ * control). Everything keys off the tokens so it follows palette, density,
+ * radius and scheme.
+ *   data-size on .sl-prose: sm | md (default) | lg
+ */
+@layer sl.components {
+  .sl-prose {
+    --_size: var(--sl-text-md);
+    --_flow: 1.1em;
+
+    max-inline-size: var(--sl-prose-max, 70ch);
+    font-size: var(--_size);
+    line-height: 1.65;
+    color: var(--sl-color-fg);
+    overflow-wrap: break-word;
+
+    &[data-size="sm"] { --_size: var(--sl-text-sm); }
+    &[data-size="lg"] { --_size: var(--sl-text-lg); }
+
+    > * + * { margin-block-start: var(--_flow); }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: var(--sl-weight-semibold);
+      letter-spacing: -0.01em;
+      line-height: var(--sl-leading-tight);
+      text-wrap: balance;
+      scroll-margin-block-start: var(--sl-space-8);
+    }
+    h1 { font-size: 2em; }
+    h2 { font-size: 1.5em; padding-block-end: 0.25em; border-block-end: 1px solid var(--sl-color-border); }
+    h3 { font-size: 1.25em; }
+    h4 { font-size: 1.05em; }
+    h5, h6 { font-size: 1em; }
+    > * + h1, > * + h2 { margin-block-start: 2em; }
+    > * + h3, > * + h4 { margin-block-start: 1.6em; }
+    h1 + *, h2 + *, h3 + *, h4 + * { margin-block-start: 0.6em; }
+
+    a { color: var(--sl-color-accent-text); text-decoration-thickness: from-font; text-underline-offset: 0.15em; }
+    strong { font-weight: var(--sl-weight-semibold); }
+    em { font-style: italic; }
+    del { color: var(--sl-color-fg-muted); }
+    sup { font-size: 0.75em; line-height: 0; }
+
+    ul, ol { padding-inline-start: 1.5em; }
+    li + li { margin-block-start: 0.3em; }
+    li > ul, li > ol { margin-block-start: 0.3em; }
+    ul { list-style: disc; }
+    ol { list-style: decimal; }
+
+    /* GFM task lists */
+    li:has(> input[type="checkbox"]) { list-style: none; margin-inline-start: -1.5em; display: flex; gap: 0.5em; align-items: baseline; }
+    li:has(> input[type="checkbox"]) > input { appearance: none; flex: none; inline-size: 1em; block-size: 1em; margin: 0; translate: 0 0.15em; border: 1px solid var(--sl-color-border-strong); border-radius: var(--sl-radius-sm); background: var(--sl-color-surface); display: grid; place-content: center; }
+    li:has(> input[type="checkbox"]) > input::before { content: ""; inline-size: 0.6em; block-size: 0.6em; scale: 0; background: var(--sl-color-accent-fg); clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
+    li:has(> input[type="checkbox"]) > input:checked { background: var(--sl-color-accent); border-color: var(--sl-color-accent); }
+    li:has(> input[type="checkbox"]) > input:checked::before { scale: 1; }
+
+    blockquote {
+      padding-inline-start: 1em;
+      border-inline-start: 3px solid var(--sl-color-border-strong);
+      color: var(--sl-color-fg-muted);
+      > * + * { margin-block-start: 0.6em; }
+    }
+
+    hr { margin-block: 2em; border: 0; border-block-start: 1px solid var(--sl-color-border); }
+
+    code {
+      font-family: var(--sl-font-mono);
+      font-size: 0.9em;
+      padding: 0.1em 0.35em;
+      border-radius: var(--sl-radius-sm);
+      background-color: var(--sl-color-surface-sunken);
+      border: 1px solid var(--sl-color-border);
+    }
+    pre {
+      padding: var(--sl-space-4);
+      border: 1px solid var(--sl-color-border);
+      border-radius: var(--sl-radius-md);
+      background-color: var(--sl-color-surface-sunken);
+      font-size: 0.875em;
+      line-height: 1.6;
+      overflow-x: auto;
+      tab-size: 2;
+      > code { padding: 0; border: 0; background: none; font-size: inherit; }
+    }
+    /* Lumis output: keep its colours, take our frame. */
+    pre.lumis { background-color: var(--sl-color-surface-sunken); }
+
+    table {
+      inline-size: 100%;
+      border-collapse: collapse;
+      font-size: 0.925em;
+      display: block;
+      overflow-x: auto;
+      th, td { padding: 0.5em 0.75em; border: 1px solid var(--sl-color-border); text-align: start; vertical-align: top; }
+      th { background-color: var(--sl-color-surface-sunken); font-weight: var(--sl-weight-semibold); }
+      thead th { border-block-end-width: 2px; }
+    }
+
+    img, video { max-inline-size: 100%; block-size: auto; border-radius: var(--sl-radius-md); }
+    figure { margin: 0; }
+    figcaption { margin-block-start: 0.5em; color: var(--sl-color-fg-muted); font-size: 0.875em; text-align: center; }
+
+    kbd { font-family: var(--sl-font-mono); font-size: 0.85em; padding: 0.05em 0.4em; border: 1px solid var(--sl-color-border-strong); border-block-end-width: 2px; border-radius: var(--sl-radius-sm); background: var(--sl-color-surface-sunken); }
+
+    /* Footnotes */
+    .footnotes { margin-block-start: 2em; padding-block-start: 1em; border-block-start: 1px solid var(--sl-color-border); font-size: 0.875em; color: var(--sl-color-fg-muted); }
+    .footnotes ol { padding-inline-start: 1.5em; }
+    a[data-footnote-ref], .footnote-ref a { text-decoration: none; }
+    a[data-footnote-backref] { text-decoration: none; margin-inline-start: 0.25em; }
+
+    details { border: 1px solid var(--sl-color-border); border-radius: var(--sl-radius-md); padding: 0.5em 0.75em; > summary { cursor: pointer; font-weight: var(--sl-weight-medium); } > * + * { margin-block-start: 0.6em; } }
+  }
+}

@@ -1,0 +1,66 @@
+/*
+ * Popover: an anchored, light-dismissable panel with arbitrary content.
+ *   data-placement on .sl-popover-panel: bottom-start (default) | bottom | bottom-end | top-start | top | top-end
+ */
+@layer sl.components {
+  .sl-popover {
+    display: inline-block;
+    position: relative;
+  }
+
+  .sl-popover-panel {
+    --_offset: var(--sl-space-2);
+
+    position: fixed;
+    inset: auto;
+    inline-size: max-content;
+    min-inline-size: 12rem;
+    max-inline-size: min(24rem, calc(100vw - var(--sl-space-8)));
+    max-block-size: min(32rem, calc(100vh - var(--sl-space-8)));
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: var(--sl-space-4);
+    border: 1px solid var(--sl-color-border);
+    border-radius: var(--sl-popover-radius, var(--sl-radius-lg));
+    background-color: var(--sl-color-surface-raised);
+    color: var(--sl-color-fg);
+    box-shadow: var(--sl-shadow-lg);
+    font-size: var(--sl-text-sm);
+
+    opacity: 0;
+    scale: 0.97;
+    transform-origin: top;
+    transition:
+      opacity var(--sl-duration-fast) var(--sl-ease),
+      scale var(--sl-duration-fast) var(--sl-ease),
+      display var(--sl-duration-fast) allow-discrete,
+      overlay var(--sl-duration-fast) allow-discrete;
+
+    &:popover-open {
+      opacity: 1;
+      scale: 1;
+      @starting-style { opacity: 0; scale: 0.97; }
+    }
+
+    &[data-placement^="top"] { transform-origin: bottom; }
+    &[data-padding="none"] { padding: 0; }
+
+    @supports (anchor-name: none) {
+      position-anchor: var(--sl-anchor);
+      position-area: block-end span-inline-end;
+      margin-block-start: var(--_offset);
+      position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+
+      &[data-placement="bottom"]     { position-area: block-end; }
+      &[data-placement="bottom-end"] { position-area: block-end span-inline-start; }
+      &[data-placement="top-start"]  { position-area: block-start span-inline-end; margin-block: 0 var(--_offset); }
+      &[data-placement="top"]        { position-area: block-start; margin-block: 0 var(--_offset); }
+      &[data-placement="top-end"]    { position-area: block-start span-inline-start; margin-block: 0 var(--_offset); }
+    }
+  }
+
+  .sl-popover-title {
+    margin-block-end: var(--sl-space-2);
+    font-weight: var(--sl-weight-semibold);
+  }
+}

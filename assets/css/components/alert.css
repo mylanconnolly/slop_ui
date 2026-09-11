@@ -1,0 +1,53 @@
+@layer sl.components {
+  .sl-alert {
+    --_bg: var(--sl-color-neutral-soft);
+    --_fg: var(--sl-color-neutral-soft-fg);
+    --_accent: var(--sl-color-neutral);
+
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--sl-space-3);
+    align-items: start;
+    padding: var(--sl-space-4);
+    border: 1px solid color-mix(in oklch, var(--_accent) 25%, transparent);
+    border-radius: var(--sl-alert-radius, var(--sl-radius-lg));
+    background-color: var(--_bg);
+    color: var(--_fg);
+    font-size: var(--sl-text-sm);
+
+    &[data-color="accent"]  { --_bg: var(--sl-color-accent-soft);  --_fg: var(--sl-color-accent-soft-fg);  --_accent: var(--sl-color-accent); }
+    &[data-color="success"] { --_bg: var(--sl-color-success-soft); --_fg: var(--sl-color-success-soft-fg); --_accent: var(--sl-color-success); }
+    &[data-color="warning"] { --_bg: var(--sl-color-warning-soft); --_fg: var(--sl-color-warning-soft-fg); --_accent: var(--sl-color-warning); }
+    &[data-color="danger"]  { --_bg: var(--sl-color-danger-soft);  --_fg: var(--sl-color-danger-soft-fg);  --_accent: var(--sl-color-danger); }
+    &[data-color="info"]    { --_bg: var(--sl-color-info-soft);    --_fg: var(--sl-color-info-soft-fg);    --_accent: var(--sl-color-info); }
+
+    > svg {
+      inline-size: 1.25rem;
+      block-size: 1.25rem;
+      margin-block-start: 0.05rem;
+    }
+    &:not(:has(> svg)) { grid-template-columns: 1fr auto; }
+
+    /* No title: usually a single line, so center the icon and close button. */
+    &:not(:has(.sl-alert-title)) {
+      align-items: center;
+      > svg { margin-block-start: 0; }
+    }
+  }
+
+  .sl-alert-title {
+    font-weight: var(--sl-weight-semibold);
+    margin-block-end: var(--sl-space-1);
+  }
+
+  .sl-alert-body {
+    min-inline-size: 0;
+  }
+
+  .sl-alert-close {
+    margin: calc(var(--sl-space-2) * -1);
+    color: inherit;
+    opacity: 0.7;
+    &:hover { opacity: 1; }
+  }
+}

@@ -1,0 +1,263 @@
+/*
+ * Form controls. Validity styling keys off :user-invalid (only after the user
+ * has interacted) and aria-invalid (server-side errors), never plain :invalid,
+ * so required fields don't scream red before anyone touches them.
+ */
+@layer sl.components {
+  .sl-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sl-space-2);
+
+    &[data-orientation="horizontal"] {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: var(--sl-space-3);
+    }
+  }
+
+  .sl-label {
+    font-size: var(--sl-text-sm);
+    font-weight: var(--sl-weight-medium);
+    line-height: var(--sl-leading-tight);
+    color: var(--sl-color-fg);
+
+    &[data-required]::after {
+      content: " *";
+      color: var(--sl-color-danger-text);
+    }
+  }
+
+  .sl-description {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-fg-muted);
+  }
+
+  .sl-error {
+    &[hidden] { display: none; }
+    display: flex;
+    align-items: center;
+    gap: var(--sl-space-1);
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-danger-text);
+  }
+
+  /* Live character count under a text control; the hook sets data-state. */
+  .sl-counter {
+    align-self: flex-end;
+    margin-block-start: calc(-1 * var(--sl-space-1));
+    font-size: var(--sl-text-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--sl-color-fg-muted);
+
+    &[data-state="limit"] { color: var(--sl-color-fg); }
+    &[data-state="over"] { color: var(--sl-color-danger-text); font-weight: var(--sl-weight-medium); }
+  }
+  .sl-field:has(> .sl-counter[data-state="over"]) {
+    > .sl-textarea, > .sl-input, > .sl-input-group > .sl-input {
+      --_border: var(--sl-color-danger);
+    }
+  }
+
+  /* ---- Text-like controls ---- */
+  .sl-input,
+  .sl-textarea,
+  .sl-native-select {
+    --_border: var(--sl-color-border-strong);
+
+    inline-size: 100%;
+    min-block-size: var(--sl-control-height-md);
+    padding-inline: var(--sl-space-3);
+    padding-block: var(--sl-space-2);
+    border: 1px solid var(--_border);
+    border-radius: var(--sl-input-radius, var(--sl-control-radius));
+    background-color: var(--sl-color-surface);
+    color: var(--sl-color-fg);
+    font-size: var(--sl-text-sm);
+    line-height: var(--sl-leading-tight);
+    box-shadow: var(--sl-input-shadow, none);
+    transition:
+      border-color var(--sl-duration-fast) var(--sl-ease),
+      box-shadow var(--sl-duration-fast) var(--sl-ease);
+
+    &::placeholder { color: var(--sl-color-fg-subtle); }
+
+    &:hover:not(:disabled) { --_border: color-mix(in oklch, var(--sl-color-border-strong), var(--sl-color-fg) 20%); }
+
+    &:focus-visible {
+      --_border: var(--sl-color-focus);
+      outline: var(--sl-focus-ring);
+      outline-offset: 0;
+      border-radius: var(--sl-input-radius, var(--sl-control-radius));
+    }
+
+    &:user-invalid,
+    &[aria-invalid="true"] {
+      --_border: var(--sl-color-danger);
+      &:focus-visible { --_border: var(--sl-color-danger); outline-color: var(--sl-color-danger); }
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background-color: var(--sl-color-surface-sunken);
+    }
+
+    &[data-size="sm"] { min-block-size: var(--sl-control-height-sm); padding-inline: var(--sl-space-2); font-size: var(--sl-text-xs); }
+    &[data-size="lg"] { min-block-size: var(--sl-control-height-lg); padding-inline: var(--sl-space-4); font-size: var(--sl-text-md); }
+  }
+
+  .sl-textarea {
+    resize: vertical;
+    line-height: var(--sl-leading);
+    /* Grows with content where supported (Baseline mid-2026); harmless otherwise. */
+    field-sizing: content;
+    min-block-size: calc(var(--sl-control-height-md) * 2);
+  }
+
+  .sl-native-select {
+    appearance: none;
+    /* Keep the caret gutter for every size: the size variants above set
+       padding-inline as a shorthand, so this must win over them. */
+    &, &[data-size] { padding-inline-end: var(--sl-space-8); }
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--sl-space-3) center;
+    background-size: 1rem;
+    cursor: pointer;
+
+    &:dir(rtl) { background-position: left var(--sl-space-3) center; }
+    &[multiple] { background-image: none; padding-inline-end: var(--sl-space-3); }
+  }
+
+  /* ---- Checkbox & radio ---- */
+  .sl-checkbox,
+  .sl-radio {
+    appearance: none;
+    flex: none;
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    margin: 0;
+    border: 1px solid var(--sl-color-border-strong);
+    background-color: var(--sl-color-surface);
+    display: grid;
+    place-content: center;
+    cursor: pointer;
+    transition:
+      background-color var(--sl-duration-fast) var(--sl-ease),
+      border-color var(--sl-duration-fast) var(--sl-ease);
+
+    &::before {
+      content: "";
+      inline-size: 0.625rem;
+      block-size: 0.625rem;
+      scale: 0;
+      transition: scale var(--sl-duration-fast) var(--sl-ease-spring);
+    }
+
+    &:checked,
+    &:indeterminate {
+      border-color: var(--sl-color-accent);
+      background-color: var(--sl-color-accent);
+      &::before { scale: 1; }
+    }
+
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    &:user-invalid,
+    &[aria-invalid="true"] { border-color: var(--sl-color-danger); }
+  }
+
+  .sl-checkbox {
+    border-radius: var(--sl-radius-sm);
+
+    &::before {
+      background-color: var(--sl-color-accent-fg);
+      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    }
+    &:indeterminate::before {
+      clip-path: inset(40% 10% 40% 10%);
+    }
+  }
+
+  .sl-radio {
+    border-radius: var(--sl-radius-full);
+    &::before {
+      border-radius: var(--sl-radius-full);
+      background-color: var(--sl-color-accent-fg);
+      inline-size: 0.5rem;
+      block-size: 0.5rem;
+    }
+  }
+
+  /* ---- Switch ---- */
+  .sl-switch {
+    --_w: 2.5rem;
+    --_h: 1.5rem;
+    --_pad: 0.125rem;
+
+    appearance: none;
+    flex: none;
+    inline-size: var(--_w);
+    block-size: var(--_h);
+    margin: 0;
+    padding: var(--_pad);
+    border: 1px solid transparent;
+    border-radius: var(--sl-radius-full);
+    background-color: var(--sl-color-border-strong);
+    cursor: pointer;
+    display: grid;
+    align-content: center;
+    transition: background-color var(--sl-duration) var(--sl-ease);
+
+    &::before {
+      content: "";
+      inline-size: calc(var(--_h) - var(--_pad) * 2 - 2px);
+      aspect-ratio: 1;
+      border-radius: var(--sl-radius-full);
+      background-color: white;
+      box-shadow: var(--sl-shadow-md);
+      transition: translate var(--sl-duration) var(--sl-ease-spring);
+    }
+
+    &:checked {
+      background-color: var(--sl-color-accent);
+      &::before { translate: calc(var(--_w) - var(--_h)) 0; }
+      &:dir(rtl)::before { translate: calc(-1 * (var(--_w) - var(--_h))) 0; }
+    }
+
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  /* A checkbox / radio / switch with its label. */
+  .sl-choice {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--sl-space-2);
+    font-size: var(--sl-text-sm);
+    cursor: pointer;
+
+    > .sl-checkbox, > .sl-radio { margin-block-start: 0.125rem; }
+    > .sl-switch { margin-block-start: -0.125rem; }
+
+    &:has(:disabled) { cursor: not-allowed; color: var(--sl-color-fg-muted); }
+  }
+
+  .sl-fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-inline-size: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sl-space-2);
+
+    > legend {
+      padding: 0;
+      margin-block-end: var(--sl-space-2);
+      font-size: var(--sl-text-sm);
+      font-weight: var(--sl-weight-medium);
+      &[data-required]::after { content: " *"; color: var(--sl-color-danger-text); }
+    }
+  }
+}

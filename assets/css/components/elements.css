@@ -1,0 +1,160 @@
+/* Small elements: skeleton, progress, spinner, kbd, separator, breadcrumbs, pagination. */
+@layer sl.components {
+  /* ---- Skeleton ---- */
+  .sl-skeleton {
+    display: block;
+    inline-size: var(--sl-skeleton-width, 100%);
+    block-size: var(--sl-skeleton-height, 1em);
+    border-radius: var(--sl-radius-sm);
+    background-color: color-mix(in oklch, var(--sl-color-neutral-soft), var(--sl-color-fg) 6%);
+    background-image: linear-gradient(90deg, transparent, color-mix(in oklch, var(--sl-color-surface-raised) 70%, transparent), transparent);
+    background-size: 200% 100%;
+    animation: sl-shimmer 1.6s linear infinite;
+
+    &[data-shape="circle"] { border-radius: var(--sl-radius-full); aspect-ratio: 1; inline-size: var(--sl-skeleton-height, 2.5rem); }
+    &[data-shape="text"] { block-size: 0.75em; margin-block: 0.25em; }
+  }
+  @keyframes sl-shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+  }
+
+  /* ---- Progress ---- */
+  .sl-progress {
+    --_value: 0;
+    inline-size: 100%;
+    block-size: 0.5rem;
+    border-radius: var(--sl-radius-full);
+    background-color: var(--sl-color-neutral-soft);
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      display: block;
+      block-size: 100%;
+      inline-size: calc(var(--_value) * 1%);
+      border-radius: inherit;
+      background-color: var(--sl-color-accent);
+      transition: inline-size var(--sl-duration-slow) var(--sl-ease);
+    }
+
+    &[data-color="success"]::before { background-color: var(--sl-color-success); }
+    &[data-color="warning"]::before { background-color: var(--sl-color-warning); }
+    &[data-color="danger"]::before  { background-color: var(--sl-color-danger); }
+    &[data-size="sm"] { block-size: 0.25rem; }
+    &[data-size="lg"] { block-size: 0.75rem; }
+
+    &[data-indeterminate]::before {
+      inline-size: 40%;
+      animation: sl-indeterminate 1.4s var(--sl-ease) infinite;
+    }
+  }
+  @keyframes sl-indeterminate {
+    from { translate: -100% 0; }
+    to   { translate: 250% 0; }
+  }
+
+  /* ---- Spinner ---- */
+  .sl-spinner {
+    display: inline-block;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    border: 2px solid color-mix(in oklch, currentColor 25%, transparent);
+    border-inline-end-color: currentColor;
+    border-radius: var(--sl-radius-full);
+    animation: sl-spin 700ms linear infinite;
+    vertical-align: middle;
+
+    &[data-size="sm"] { inline-size: 1rem; block-size: 1rem; }
+    &[data-size="lg"] { inline-size: 2rem; block-size: 2rem; border-width: 3px; }
+  }
+
+  /* ---- Kbd ---- */
+  .sl-kbd {
+    display: inline-block;
+    padding: 0.05em 0.4em;
+    border: 1px solid var(--sl-color-border-strong);
+    border-block-end-width: 2px;
+    border-radius: var(--sl-radius-sm);
+    background-color: var(--sl-color-surface-sunken);
+    color: var(--sl-color-fg-muted);
+    font-family: var(--sl-font-mono);
+    font-size: 0.8em;
+    line-height: 1.4;
+  }
+
+  /* ---- Separator ---- */
+  .sl-separator {
+    display: flex;
+    align-items: center;
+    gap: var(--sl-space-3);
+    margin: 0;
+    border: 0;
+    color: var(--sl-color-fg-subtle);
+    font-size: var(--sl-text-xs);
+
+    &::before, &::after {
+      content: "";
+      flex: 1;
+      border-block-start: 1px solid var(--sl-color-border);
+    }
+    &:empty { gap: 0; }
+
+    &[aria-orientation="vertical"] {
+      flex-direction: column;
+      align-self: stretch;
+      inline-size: auto;
+      &::before, &::after { border-block-start: 0; border-inline-start: 1px solid var(--sl-color-border); }
+    }
+  }
+
+  /* ---- Breadcrumbs ---- */
+  .sl-breadcrumbs {
+    ol {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--sl-space-2);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: var(--sl-text-sm);
+    }
+    li {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sl-space-2);
+      color: var(--sl-color-fg-muted);
+      > svg { inline-size: 1rem; block-size: 1rem; color: var(--sl-color-fg-subtle); rotate: -90deg; }
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+      &:hover { color: var(--sl-color-fg); text-decoration: underline; }
+    }
+    [aria-current="page"] { color: var(--sl-color-fg); font-weight: var(--sl-weight-medium); }
+  }
+
+  /* ---- Pagination ---- */
+  .sl-pagination {
+    ul {
+      display: flex;
+      align-items: center;
+      gap: var(--sl-space-1);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .sl-button[aria-current="page"] {
+      --_bg: var(--sl-color-accent-soft);
+      --_fg: var(--sl-color-accent-soft-fg);
+      --_border: transparent;
+    }
+    .sl-pagination-gap {
+      display: inline-grid;
+      place-items: center;
+      inline-size: var(--sl-control-height-md);
+      color: var(--sl-color-fg-subtle);
+    }
+  }
+}

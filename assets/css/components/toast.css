@@ -1,0 +1,73 @@
+/*
+ * Toasts. A fixed region holds a stack; each toast is role=status (polite)
+ * or role=alert (assertive, for danger/warning).
+ *   data-position on .sl-toaster: bottom-end (default) | bottom-start | bottom-center | top-end | top-start | top-center
+ */
+@layer sl.components {
+  .sl-toaster {
+    position: fixed;
+    inset-block-end: var(--sl-space-4);
+    inset-inline-end: var(--sl-space-4);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sl-space-2);
+    inline-size: min(22rem, calc(100vw - var(--sl-space-8)));
+    pointer-events: none;
+
+    &[data-position^="top"]   { inset-block-end: auto; inset-block-start: var(--sl-space-4); }
+    &[data-position$="start"] { inset-inline-end: auto; inset-inline-start: var(--sl-space-4); }
+    &[data-position$="center"] { inset-inline-end: auto; inset-inline-start: 50%; translate: -50% 0; }
+    &[data-position^="bottom"] { flex-direction: column-reverse; }
+
+    &:empty { display: none; }
+  }
+
+  .sl-toast {
+    --_accent: var(--sl-color-neutral);
+
+    pointer-events: auto;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--sl-space-3);
+    align-items: start;
+    padding: var(--sl-space-3) var(--sl-space-4);
+    border: 1px solid var(--sl-color-border);
+    border-inline-start: 3px solid var(--_accent);
+    border-radius: var(--sl-toast-radius, var(--sl-radius-lg));
+    background-color: var(--sl-color-surface-raised);
+    color: var(--sl-color-fg);
+    box-shadow: var(--sl-shadow-lg);
+    font-size: var(--sl-text-sm);
+
+    animation: sl-toast-in var(--sl-duration-slow) var(--sl-ease-out);
+
+    &[data-color="accent"]  { --_accent: var(--sl-color-accent); }
+    &[data-color="success"] { --_accent: var(--sl-color-success); }
+    &[data-color="warning"] { --_accent: var(--sl-color-warning); }
+    &[data-color="danger"]  { --_accent: var(--sl-color-danger); }
+    &[data-color="info"]    { --_accent: var(--sl-color-info); }
+
+    > svg { inline-size: 1.25rem; block-size: 1.25rem; color: var(--_accent); margin-block-start: 0.05rem; }
+    &:not(:has(> svg)) { grid-template-columns: 1fr auto; }
+
+    /* Title only: one line of text, so center the icon and close button on it. */
+    &:not(:has(.sl-toast-description)) {
+      align-items: center;
+      > svg { margin-block-start: 0; }
+    }
+
+    &.sl-toast-leaving { animation: sl-toast-out var(--sl-duration) var(--sl-ease-in) forwards; }
+  }
+
+  .sl-toast-title { font-weight: var(--sl-weight-semibold); }
+  .sl-toast-description { color: var(--sl-color-fg-muted); }
+  .sl-toast-close { margin: calc(var(--sl-space-2) * -1); margin-inline-start: 0; }
+
+  @keyframes sl-toast-in {
+    from { opacity: 0; translate: 0 0.5rem; scale: 0.97; }
+  }
+  @keyframes sl-toast-out {
+    to { opacity: 0; scale: 0.97; }
+  }
+}
