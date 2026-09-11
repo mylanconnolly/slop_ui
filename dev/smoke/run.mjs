@@ -13,21 +13,25 @@ const filters = filterArg.split(",").filter(Boolean)
 const json = flags.includes("--json")
 const chromeBin = process.env.CHROME_BIN || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 const port = 9400 + Math.floor(Math.random() * 400)
-const chrome = spawn(chromeBin, ["--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "sl-smoke-"))}`, "--no-first-run", "--no-default-browser-check", "--window-size=1280,900", "about:blank"], { stdio: process.env.SMOKE_DEBUG ? ["ignore", "ignore", "inherit"] : "ignore" })
+const chrome = spawn(chromeBin, [...(process.env.CHROME_NO_SANDBOX === "1" ? ["--no-sandbox"] : []), "--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "sl-smoke-"))}`, "--no-first-run", "--no-default-browser-check", "--window-size=1280,900", "about:blank"], { stdio: ["ignore", "ignore", "pipe"] })
+let chromeError = ""
+chrome.stderr.on("data", (chunk) => { chromeError = (chromeError + chunk).slice(-8000) })
+chrome.on("error", (error) => { chromeError += error.message })
+process.on("exit", () => chrome.kill())
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 // One browser connection and one tab. Scenarios navigate to a fresh page
 // each, which resets all page state; closing/reopening tabs per scenario
 // crashed headless Chrome 152 after a few cycles.
 let browser
-for (let i = 0; i < 50 && !browser; i++) {
+for (let i = 0; i < 300 && !browser; i++) {
   try { browser = (await (await fetch(`http://127.0.0.1:${port}/json/version`)).json()).webSocketDebuggerUrl } catch {}
   if (!browser) await sleep(100)
 }
+if (!browser) throw new Error(`Chrome failed to start (${chromeBin}): ${chromeError}`)
 const ws = new WebSocket(browser)
 await new Promise((r) => (ws.onopen = r))
 ws.onclose = (e) => { console.error(`browser connection closed unexpectedly (code ${e.code}); Chrome probably crashed`); chrome.kill(); process.exit(1) }
-process.on("exit", () => chrome.kill())
 let id = 0; const pending = new Map()
 let events = []
 let sessionId = null

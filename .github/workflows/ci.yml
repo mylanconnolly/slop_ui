@@ -69,6 +69,10 @@ jobs:
 
   browser:
     name: Chrome interactions and palette contrast
+    env:
+      # The hosted Ubuntu runner restricts Chrome user namespaces.
+      # This browser only visits the local test server on an ephemeral runner.
+      CHROME_NO_SANDBOX: "1"
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:

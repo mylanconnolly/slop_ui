@@ -12,14 +12,19 @@ const palettes = (palettesArg || "warm").split(",")
 const json = flags.includes("--json")
 const chromeBin = process.env.CHROME_BIN || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 const port = 9400 + Math.floor(Math.random() * 400)
-const chrome = spawn(chromeBin, ["--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "sl-audit-"))}`, "--no-first-run", "--no-default-browser-check", "about:blank"], { stdio: "ignore" })
+const chrome = spawn(chromeBin, [...(process.env.CHROME_NO_SANDBOX === "1" ? ["--no-sandbox"] : []), "--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "sl-audit-"))}`, "--no-first-run", "--no-default-browser-check", "about:blank"], { stdio: ["ignore", "ignore", "pipe"] })
+let chromeError = ""
+chrome.stderr.on("data", (chunk) => { chromeError = (chromeError + chunk).slice(-8000) })
+chrome.on("error", (error) => { chromeError += error.message })
+process.on("exit", () => chrome.kill())
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 let target
-for (let i = 0; i < 50 && !target; i++) {
+for (let i = 0; i < 300 && !target; i++) {
   try { target = (await (await fetch(`http://127.0.0.1:${port}/json`)).json()).find((t) => t.type === "page") } catch {}
   if (!target) await sleep(100)
 }
+if (!target) throw new Error(`Chrome failed to start (${chromeBin}): ${chromeError}`)
 const ws = new WebSocket(target.webSocketDebuggerUrl)
 await new Promise((r) => (ws.onopen = r))
 let id = 0; const pending = new Map()
