@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 — 2026-09-28
+
+### Fixed
+
+- `SlDialog` no longer closes a dialog opened with `SlopUI.JS.open_dialog/1` when the server re-renders it — for example on the first `phx-change` keystroke in a form inside the dialog. The hook now acts on `data-open` only when the server changes it, so a dialog the user dismissed is also no longer reopened by an unrelated patch.
+
 ## 0.1.0 — 2026-09-11
 
 Initial public release.
