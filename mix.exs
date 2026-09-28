@@ -68,7 +68,7 @@ defmodule SlopUI.MixProject do
     [
       dev: "run --no-halt dev.exs",
       "assets.build": ["esbuild sink"],
-      "assets.test": ["cmd node --test assets/js/*.test.js"],
+      "assets.test": ["cmd node --test assets/js/*.test.js assets/js/hooks/*.test.js"],
       "sink.smoke": ["sink.smoke"],
       "assets.watch": ["esbuild sink --watch"]
     ]

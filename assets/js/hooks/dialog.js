@@ -19,6 +19,7 @@ export default {
   mounted() {
     this.js().ignoreAttributes(this.el, "open")
     this.wasOpen = false
+    this.serverOpen = this.el.dataset.open
 
     this.el.addEventListener("sl:open", () => this.open())
     this.el.addEventListener("sl:close", () => this.close())
@@ -43,8 +44,16 @@ export default {
     if (this.el.dataset.open === "true") this.open()
   },
 
+  /*
+   * Only act when the server *changes* data-open. A dialog opened with
+   * open_dialog (or closed with Escape) keeps the server's stale value, so
+   * re-applying it on every patch would, for example, close a JS-opened
+   * dialog on the first phx-change keystroke inside it.
+   */
   updated() {
     const want = this.el.dataset.open
+    if (want === this.serverOpen) return
+    this.serverOpen = want
     if (want === "true" && !this.el.open) this.open()
     if (want === "false" && this.el.open) this.close()
   },
