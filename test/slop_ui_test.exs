@@ -680,6 +680,39 @@ defmodule SlopUI.ShellTest do
     assert html =~ ~s(<a href="#app-main" class="sl-skip-link">Skip to content</a>)
   end
 
+  test "sidebar slot provides stable unique IDs for menus in both copies" do
+    render = fn ->
+      render_component(&app_shell/1,
+        id: "app",
+        sidebar: [
+          %{
+            inner_block: fn _, sidebar_id ->
+              render_component(&menu/1,
+                id: "#{sidebar_id}-workspaces",
+                trigger: slot("Workspaces"),
+                inner_block: slot("Items")
+              )
+              |> Phoenix.HTML.raw()
+            end
+          }
+        ],
+        inner_block: slot("MAIN")
+      )
+    end
+
+    html = render.()
+    assert html == render.()
+    ids = Regex.scan(~r/ id="([^"]+)"/, html, capture: :all_but_first) |> List.flatten()
+    assert length(ids) == length(Enum.uniq(ids))
+
+    for surface <- ["desktop", "mobile"] do
+      id = "app-sidebar-#{surface}-workspaces"
+      assert html =~ ~s(id="#{id}")
+      assert html =~ ~s(popovertarget="#{id}-list")
+      assert html =~ ~s(aria-labelledby="#{id}-trigger")
+    end
+  end
+
   test "nav item marks the current page and renders a badge" do
     html =
       render_component(&nav_item/1,

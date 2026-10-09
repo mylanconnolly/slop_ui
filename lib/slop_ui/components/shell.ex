@@ -27,7 +27,20 @@ defmodule SlopUI.Components.Shell do
       </.app_shell>
 
   The sidebar slot is rendered once for the desktop column and once inside a
-  `sheet` for narrow viewports, so avoid ids inside it. Set
+  `sheet` for narrow viewports. Use the slot argument as a stable ID prefix
+  for components inside it so the two copies have distinct IDs:
+
+      <:sidebar :let={sidebar_id}>
+        <.sidebar>
+          <.menu id={"\#{sidebar_id}-workspaces"}>
+            <:trigger>Switch workspace</:trigger>
+            <.menu_item href="/workspaces">All workspaces</.menu_item>
+          </.menu>
+        </.sidebar>
+      </:sidebar>
+
+  The prefixes are `<shell-id>-sidebar-desktop` and `<shell-id>-sidebar-mobile`.
+  Slots that do not use `:let` continue to work unchanged. Set
   `--sl-sidebar-width` and `--sl-topbar-height` to change the geometry.
   """
   attr :id, :string, required: true
@@ -53,7 +66,7 @@ defmodule SlopUI.Components.Shell do
     <div id={@id} class={[@class, "sl-app-shell"]} data-sidebar={@sidebar == [] && "none"} {@rest}>
       <a href={"##{@id}-main"} class="sl-skip-link">{t("Skip to content")}</a>
       <%= if @sidebar != [] do %>
-        {render_slot(@sidebar)}
+        {render_slot(@sidebar, "#{@id}-sidebar-desktop")}
         <dialog
           id={"#{@id}-nav"}
           class="sl-sheet sl-sidebar-sheet"
@@ -76,7 +89,7 @@ defmodule SlopUI.Components.Shell do
               aria-label={t("Close")}
             ><.icon name="x-mark" /></button>
           </form>
-          {render_slot(@sidebar)}
+          {render_slot(@sidebar, "#{@id}-sidebar-mobile")}
         </dialog>
       <% end %>
       <header :for={topbar <- @topbar} class={[topbar[:class], "sl-topbar"]}>
