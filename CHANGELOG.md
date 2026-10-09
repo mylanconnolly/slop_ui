@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2 — 2026-10-09
+
+### Added
+
+- `app_shell` passes a stable, surface-specific ID prefix to its sidebar slot through `:let`, allowing menus and other ID-bearing components to work in both the desktop sidebar and mobile sheet without duplicate IDs. Existing slots remain compatible.
+
 ## 0.1.1 — 2026-09-28
 
 ### Fixed
